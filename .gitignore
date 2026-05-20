@@ -231,3 +231,5 @@ data/processed/*
 models/*.pkl
 
 downloaded_files/
+
+requirements_old.txt

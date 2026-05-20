@@ -4,3 +4,6 @@ tournaments:
   world_cup:
     raw_path: "data/raw/matches_1930_2022.csv"
     processed_path: "data/processed/cleaned_wm_data.csv"
+
+model:
+  decay_rate: 0.15

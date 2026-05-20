@@ -5,6 +5,8 @@ Dieses Skript steuert das Modell-Training der CornerPredictionEngine.
 Es lädt die aufbereiteten WM-Daten, führt einen strikten, chronologischen
 Time-Based Split durch (Training auf historischen Daten, Test auf modernen Turnieren)
 und trainiert zwei stark regulierte XGBoost-Regressoren für Heim- und Auswärtstore.
+
+NEU: Time-Decay-Gewichtung – neuere WMs beeinflussen das Modell stärker als alte.
 """
 
 import sys
@@ -17,22 +19,24 @@ from sklearn.metrics import mean_absolute_error
 
 
 def load_config() -> dict:
-    """Lädt die zentrale Konfigurationsdatei (config.yaml).
-
-    Returns:
-        dict: Die geladenen Konfigurationsparameter.
-    """
+    """Lädt die zentrale Konfigurationsdatei (config.yaml)."""
     with open("config.yaml", "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def main():
     """Hauptfunktion für das Laden der Features, den chronologischen Split,
-
     das Training der XGBoost-Modelle und die anschließende Evaluierung.
     """
     config = load_config()
     data_path = config["tournaments"]["world_cup"]["processed_path"]
+
+    # === NEU: Decay-Rate aus Config lesen ===
+    # decay_rate steuert, wie stark alte WMs "verblassen":
+    # 0.0  = alle Spiele gleich gewichtet (Verhalten wie vorher)
+    # 0.15 = moderater Decay (Empfehlung)
+    # 0.5  = aggressiv, fast nur die letzte WM zählt
+    decay_rate = config["model"]["decay_rate"]
 
     print(f"⏳ Lade aufbereitete moderne WM-Daten aus '{data_path}'...")
     try:
@@ -40,7 +44,7 @@ def main():
     except FileNotFoundError:
         print(f"❌ Fehler: Die Datei '{data_path}' wurde nicht gefunden. Bitte prepare_data.py zuerst ausführen.")
         sys.exit(1)
-        
+
     df["date"] = pd.to_datetime(df["date"])
 
     # Exakte Feature-Liste, auf der die Bäume trainiert werden
@@ -78,20 +82,38 @@ def main():
     y_home_test = test_df["home_score"]
     y_away_test = test_df["away_score"]
 
+    # === NEU: Time-Decay-Gewichte berechnen ===
+    # Für jedes Trainings-Spiel: wie viele Jahre liegt es zurück?
+    # WICHTIG: Nur auf train_df! Testdaten dürfen nicht gewichtet werden,
+    # sonst verfälscht das die Evaluierung.
+    current_year = 2026
+    years_ago = current_year - train_df["date"].dt.year
+
+    # Exponentieller Decay: w = exp(-λ * years_ago)
+    # Beispiel mit λ=0.15:
+    #   Spiel von 2002 (24 Jahre alt): w ≈ 0.027  (fast irrelevant)
+    #   Spiel von 2014 (12 Jahre alt): w ≈ 0.165
+    #   Spiel von 2022 (4 Jahre alt):  w ≈ 0.549
+    weights = np.exp(-decay_rate * years_ago)
+
+    print(f"⚖️ Time-Decay aktiv (λ={decay_rate}). "
+          f"Gewichtsbereich: {weights.min():.3f} bis {weights.max():.3f}")
+
     # --- MODELL-TRAINING (HEIMTORE) ---
     # Stark reguliert (max_depth=3, reg_alpha/lambda), um Overfitting im Keim zu ersticken
     print("🤖 Trainiere stark reguliertes Modell für HEIM-Tore...")
     model_home = xgb.XGBRegressor(
         n_estimators=120,
         learning_rate=0.02,
-        max_depth=3,  # Flache Bäume verhindern das Auswendiglernen von Details
-        subsample=0.7,  # Nutzt nur 70% der Zeilen pro Baum zur Varianz-Reduktion
-        colsample_bytree=0.7,  # Nutzt nur 70% der Spalten pro Baum
-        reg_alpha=1.5,  # L1-Regularisierung (Sparsity)
-        reg_lambda=1.5,  # L2-Regularisierung (Ridge-Strafe auf extreme Gewichte)
-        random_state=42,  # Fixierter Seed für exakte Reproduzierbarkeit
+        max_depth=3,
+        subsample=0.7,
+        colsample_bytree=0.7,
+        reg_alpha=1.5,
+        reg_lambda=1.5,
+        random_state=42,
     )
-    model_home.fit(X_train, y_home_train)
+    # === GEÄNDERT: sample_weight übergeben ===
+    model_home.fit(X_train, y_home_train, sample_weight=weights)
 
     # --- MODELL-TRAINING (AUSWÄRTSTORE) ---
     print("🤖 Trainiere stark reguliertes Modell für AUSWÄRTS-Tore...")
@@ -105,13 +127,13 @@ def main():
         reg_lambda=1.5,
         random_state=42,
     )
-    model_away.fit(X_train, y_away_train)
+    # === GEÄNDERT: sample_weight übergeben ===
+    model_away.fit(X_train, y_away_train, sample_weight=weights)
 
     # --- EVALUIERUNG ---
     pred_home = model_home.predict(X_test)
     pred_away = model_away.predict(X_test)
 
-    # Berechnung des mittleren absoluten Fehlers (MAE)
     mae_home = mean_absolute_error(y_home_test, pred_home)
     mae_away = mean_absolute_error(y_away_test, pred_away)
 
@@ -119,13 +141,12 @@ def main():
     print(f"   Fehler Heimtore: {mae_home:.2f} Tore im Schnitt daneben.")
     print(f"   Fehler Auswärtstore: {mae_away:.2f} Tore im Schnitt daneben.")
 
-    # Statistischer Baseline-Vergleich gegen den globalen Torschnitt (Dummy)
     baseline_home_mae = mean_absolute_error(
         y_home_test, np.full_like(y_home_test, 1.3, dtype=float)
     )
     print(f"   💡 Zum Vergleich der Turnier-Dummy-Tipp: {baseline_home_mae:.2f}")
 
-    # Serialization (Modelle einfrieren für spätere Live-Inferenz)
+    # Serialisierung (Modelle einfrieren für spätere Live-Inferenz)
     joblib.dump(model_home, "models/wm_home_goals_model.pkl")
     joblib.dump(model_away, "models/wm_away_goals_model.pkl")
     print("\n💾 Beide High-End-Modelle erfolgreich im Ordner 'models/' gespeichert!")
