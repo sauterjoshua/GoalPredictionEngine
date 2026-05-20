@@ -6,7 +6,17 @@ Jedes Asset entspricht einem "Datenprodukt": eine CSV-Datei, ein Modell, ein Plo
 Dagster erkennt automatisch die Abhängigkeiten zwischen den Assets.
 """
 
-from dagster import asset, AssetExecutionContext, define_asset_job, ScheduleDefinition, MaterializeResult, MetadataValue
+from dagster import (
+    asset,
+    AssetExecutionContext,
+    define_asset_job,
+    sensor,
+    RunRequest,
+    SkipReason,
+    SensorEvaluationContext,
+    MaterializeResult,
+    MetadataValue,
+)
 
 
 @asset
@@ -89,11 +99,46 @@ wm_pipeline_job = define_asset_job(
 )
 
 
-# === SCHEDULE DEFINITION ===
-# Cron-Ausdruck "0 */12 * * *" = "zur Minute 0, alle 12 Stunden"
-# Also: 00:00 Uhr und 12:00 Uhr (Mitternacht und Mittag)
-wm_pipeline_schedule = ScheduleDefinition(
-    name="wm_pipeline_12h_schedule",
+# === SENSOR DEFINITION ===
+# Pollt alle 5 Minuten die API und triggert den Job, sobald neue
+# FINISHED-Spiele aufgetaucht sind — ersetzt den festen 12h-Schedule.
+@sensor(
     job=wm_pipeline_job,
-    cron_schedule="0 */12 * * *",
+    minimum_interval_seconds=300,  # alle 5 Minuten
+    description="Triggert die Pipeline, sobald ein neues Spiel FINISHED ist.",
 )
+def new_finished_matches_sensor(context: SensorEvaluationContext):
+    """
+    Cursor-Strategie: speichert die Anzahl bekannter FINISHED-Spiele als
+    Integer-String. Bleibt über Daemon-Neustarts hinweg erhalten.
+    """
+    # 1. Cursor lesen (letzter bekannter FINISHED-Count)
+    last_count = int(context.cursor) if context.cursor else 0
+
+    # 2. API fragen — gibt einen DataFrame zurück
+    try:
+        from .data_sources import fetch_world_cup_2026_matches
+        df = fetch_world_cup_2026_matches()
+        current_count = int((df["status"] == "FINISHED").sum())
+    except Exception as exc:
+        return SkipReason(f"API-Fehler beim Abrufen der WM-Daten: {exc}")
+
+    # 3. Logging — sichtbar in Dagster-UI unter Sensors → Ticks
+    context.log.info(
+        f"FINISHED-Spiele: {current_count} (vorher: {last_count})"
+    )
+
+    # 4. Entscheiden
+    if current_count > last_count:
+        # Cursor VOR dem RunRequest setzen: verhindert Endlos-Retriggern
+        # falls der Job selbst fehlschlägt.
+        context.update_cursor(str(current_count))
+        return RunRequest(
+            run_key=f"finished_count_{current_count}",
+            tags={"trigger": "sensor", "finished_matches": str(current_count)},
+        )
+
+    return SkipReason(
+        f"Keine neuen FINISHED-Spiele ({current_count}). "
+        f"Nächster Check in ~5 Minuten."
+    )

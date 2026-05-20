@@ -9,6 +9,7 @@ und trainiert zwei stark regulierte XGBoost-Regressoren für Heim- und Auswärts
 NEU: Time-Decay-Gewichtung – neuere WMs beeinflussen das Modell stärker als alte.
 """
 
+import os
 import sys
 import joblib
 import numpy as np
@@ -147,6 +148,7 @@ def main():
     print(f"   💡 Zum Vergleich der Turnier-Dummy-Tipp: {baseline_home_mae:.2f}")
 
     # Serialisierung (Modelle einfrieren für spätere Live-Inferenz)
+    os.makedirs("models", exist_ok=True)
     joblib.dump(model_home, "models/wm_home_goals_model.pkl")
     joblib.dump(model_away, "models/wm_away_goals_model.pkl")
     print("\n💾 Beide High-End-Modelle erfolgreich im Ordner 'models/' gespeichert!")

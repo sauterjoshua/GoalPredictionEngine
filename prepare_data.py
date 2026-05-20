@@ -8,6 +8,7 @@ zu Kader-Gesamtmarktwerten. Zudem wird ein Feature für den echten
 Heimvorteil von WM-Gastgebern injiziert.
 """
 
+import os
 import sys
 import numpy as np
 import pandas as pd
@@ -22,6 +23,31 @@ def load_config() -> dict:
     """
     with open("config.yaml", "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
+def merge_live_data(df_historical: pd.DataFrame, live_path: str) -> pd.DataFrame:
+    """Merged abgeschlossene Live-Spiele aus einer separaten CSV in den historischen DataFrame.
+
+    Gibt df_historical unverändert zurück, wenn die Datei fehlt oder keine
+    FINISHED-Zeilen enthält.
+    """
+    if not os.path.exists(live_path):
+        print(f"⚠️  Live-Datei nicht gefunden ('{live_path}'). Überspringe Merge.")
+        return df_historical
+
+    df_live = pd.read_csv(live_path)
+
+    df_live = df_live[df_live["status"] == "FINISHED"]
+
+    if df_live.empty:
+        print("⚠️  Keine abgeschlossenen Spiele in der Live-CSV. Überspringe Merge.")
+        return df_historical
+
+    if "status" in df_live.columns:
+        df_live = df_live.drop(columns=["status"])
+
+    print(f"🔀 Merge {len(df_live)} Live-Spiel(e) aus '{live_path}'...")
+    return pd.concat([df_historical, df_live], ignore_index=True)
 
 
 def harmony_columns(df_matches: pd.DataFrame) -> pd.DataFrame:
@@ -79,25 +105,13 @@ def harmony_columns(df_matches: pd.DataFrame) -> pd.DataFrame:
 
 
 def convert_dates(df_matches: pd.DataFrame) -> pd.DataFrame:
-    """Konvertiert die Datumsspalte intelligent – unabhängig davon, ob es sich
-
-    um reine Jahreszahlen oder vollständige Datums-Strings handelt.
+    """Konvertiert die Datumsspalte in datetime – unterstützt reine Jahreszahlen
+    (z.B. 2022) sowie vollständige ISO-Strings (z.B. 2026-06-11T18:00:00Z).
     """
-    sample_date = (
-        str(df_matches["date"].dropna().iloc[0]).split(".")[0].strip()
-    )
-
-    if sample_date.isdigit() and len(sample_date) == 4:
-        print(
-            "📅 Format-Erkennung: Reine Jahreszahlen (z.B. 2022). Setze fixe Zeitachse..."
-        )
-        df_matches["date"] = pd.to_datetime(
-            df_matches["date"].astype(int).astype(str) + "-01-01",
-            errors="coerce",
-        )
-    else:
-        print("📅 Format-Erkennung: Vollständige Datums-Strings. Konvertiere...")
-        df_matches["date"] = pd.to_datetime(df_matches["date"], errors="coerce")
+    print("📅 Konvertiere Datumsspalte (gemischte Formate möglich)...")
+    df_matches["date"] = pd.to_datetime(
+        df_matches["date"].astype(str), errors="coerce", utc=True
+    ).dt.tz_convert(None)
 
     # Sortieren und Zeilen ohne essenzielle Match-Daten entfernen
     df_matches = df_matches.sort_values("date").reset_index(drop=True)
@@ -246,11 +260,13 @@ def process_data():
     config = load_config()
     raw_path = config["tournaments"]["world_cup"]["raw_path"]
     processed_path = config["tournaments"]["world_cup"]["processed_path"]
+    live_path = config["tournaments"]["world_cup"]["live_path"]
     market_value_path = "data/raw/fifa_player_performance_market_value.csv"
 
     # Datensätze einlesen
     print(f"⏳ Lade Match-Daten aus '{raw_path}'...")
     df_matches = pd.read_csv(raw_path)
+    df_matches = merge_live_data(df_matches, live_path)
 
     print(f"⏳ Lade Marktwert-Daten aus '{market_value_path}'...")
     try:

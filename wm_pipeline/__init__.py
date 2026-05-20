@@ -1,21 +1,25 @@
 """
 wm_pipeline/__init__.py
 
-Registriert alle Assets, Jobs und Schedules dieses Moduls bei Dagster.
+Registriert alle Assets, Jobs und Sensors dieses Moduls bei Dagster.
 """
 
-from dagster import Definitions, load_assets_from_modules
+from dagster import Definitions
 
-from wm_pipeline import assets
-from wm_pipeline.assets import wm_pipeline_job, wm_pipeline_schedule
-
-# Alle Assets aus assets.py automatisch laden
-all_assets = load_assets_from_modules([assets])
+from .assets import (
+    wm2026_live_data,
+    cleaned_wm_data,
+    trained_models,
+    diagnostic_plots,
+    wm_pipeline_job,
+    new_finished_matches_sensor,
+)
 
 # Definitions ist das "Inhaltsverzeichnis" für Dagster:
-# alles was Dagster kennen soll, wird hier registriert
+# alles was Dagster kennen soll, wird hier registriert.
+# Schedule wurde durch den event-getriebenen Sensor ersetzt.
 defs = Definitions(
-    assets=all_assets,
+    assets=[wm2026_live_data, cleaned_wm_data, trained_models, diagnostic_plots],
     jobs=[wm_pipeline_job],
-    schedules=[wm_pipeline_schedule],
+    sensors=[new_finished_matches_sensor],
 )
