@@ -1,17 +1,11 @@
 """
-notify.py
-
 Verschickt die aktuellen WM-2026-Vorhersagen per Telegram-Bot.
-
-Liest die im letzten Pipeline-Lauf erzeugte predictions.csv und sendet eine
-formatierte Übersicht der anstehenden Spiele + Tipps an einen Telegram-Chat.
-Wird später als Dagster-Asset nach 'match_predictions' ausgeführt.
 
 Benötigt in der .env:
     TELEGRAM_BOT_TOKEN=...
     TELEGRAM_CHAT_ID=...
 
-CLI-Test:  python notify.py
+CLI-Test: python notify.py
 """
 
 import os
@@ -22,10 +16,7 @@ import yaml
 from dotenv import load_dotenv
 
 
-# --------------------------------------------------------------------------
-# Flaggen-Emoji aus Ländernamen
-# (Kopie aus dashboard.py — könnte später in ein gemeinsames flags.py wandern)
-# --------------------------------------------------------------------------
+# TODO: in gemeinsames flags.py auslagern (Duplikat von dashboard.py)
 COUNTRY_TO_ISO = {
     "Germany": "DE", "France": "FR", "Spain": "ES", "Italy": "IT",
     "England": "GB", "Brazil": "BR", "Argentina": "AR", "Portugal": "PT",
@@ -50,9 +41,6 @@ def flag_emoji(country: str) -> str:
     return "".join(chr(0x1F1E6 + (ord(c) - ord("A"))) for c in iso.upper())
 
 
-# --------------------------------------------------------------------------
-# Konfiguration & Daten
-# --------------------------------------------------------------------------
 def load_predictions_path() -> str:
     """Liest den Pfad zur predictions.csv aus der config.yaml."""
     with open("config.yaml", "r", encoding="utf-8") as f:
@@ -61,14 +49,7 @@ def load_predictions_path() -> str:
 
 
 def build_message(df: pd.DataFrame) -> str:
-    """Baut die formatierte Telegram-Nachricht (HTML-Modus) aus den Vorhersagen.
-
-    Args:
-        df (pd.DataFrame): Die Vorhersagen aus predictions.csv.
-
-    Returns:
-        str: Fertige HTML-Nachricht.
-    """
+    """Baut die formatierte Telegram-Nachricht (HTML-Modus) aus den Vorhersagen."""
     lines = ["<b>⚽ WM 2026 — Tipps für die nächsten Spiele</b>", ""]
 
     for _, row in df.iterrows():
@@ -84,17 +65,8 @@ def build_message(df: pd.DataFrame) -> str:
     return "\n".join(lines)
 
 
-# --------------------------------------------------------------------------
-# Telegram-Versand
-# --------------------------------------------------------------------------
 def send_telegram_message(text: str) -> bool:
-    """Schickt eine Nachricht über die Telegram-Bot-API.
-
-    Token + Chat-ID kommen aus den Umgebungsvariablen (.env).
-
-    Returns:
-        bool: True bei Erfolg, sonst False.
-    """
+    """Schickt eine Nachricht über die Telegram-Bot-API (Token + Chat-ID aus .env)."""
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
@@ -127,9 +99,9 @@ def run_notification() -> int:
     """Lädt die aktuellen Vorhersagen und verschickt sie per Telegram.
 
     Returns:
-        int: Anzahl der benachrichtigten Spiele (0 = nichts gesendet).
+        int: Anzahl benachrichtigter Spiele (0 = nichts gesendet).
     """
-    load_dotenv()  # .env einlesen
+    load_dotenv()
 
     predictions_path = load_predictions_path()
 
@@ -139,7 +111,6 @@ def run_notification() -> int:
         print(f"ℹ️ Keine predictions.csv unter '{predictions_path}'. Nichts zu senden.")
         return 0
 
-    # Leer-Fall: nichts schicken (keine leeren Alerts)
     if df.empty:
         print("ℹ️ Keine Spiele im Vorhersage-Fenster. Keine Benachrichtigung.")
         return 0

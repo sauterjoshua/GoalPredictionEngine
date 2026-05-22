@@ -1,11 +1,6 @@
 """
-prepare_data.py
-
-Dieses Skript bildet die Data-Engineering-Pipeline des Projekts.
-Es lädt die Rohdaten, bereinigt und harmonisiert die Spaltenstrukturen,
-berechnet dynamische Formkurven und aggregiert die Spieler-Marktwerte
-zu Kader-Gesamtmarktwerten. Zudem wird ein Feature für den echten 
-Heimvorteil von WM-Gastgebern injiziert.
+Data-Engineering-Pipeline: harmonisiert Rohdaten, berechnet Formkurven,
+aggregiert Kader-Marktwerte und injiziert den WM-Gastgeber-Heimvorteil.
 """
 
 import os
@@ -23,11 +18,7 @@ MARKET_VALUE_NAME_MAP = {
 }
 
 def load_config() -> dict:
-    """Lädt die zentrale Konfigurationsdatei (config.yaml).
-
-    Returns:
-        dict: Die geladenen Konfigurationsparameter.
-    """
+    """Lädt die zentrale Konfigurationsdatei (config.yaml)."""
     with open("config.yaml", "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
@@ -58,13 +49,10 @@ def merge_live_data(df_historical: pd.DataFrame, live_path: str) -> pd.DataFrame
 
 
 def harmony_columns(df_matches: pd.DataFrame) -> pd.DataFrame:
-    """Harmonisiert unterschiedliche Spaltennamen aus historischen Rohdaten
-
-    auf ein einheitliches, intern definiertes Namensschema.
-    """
+    """Harmonisiert unterschiedliche Spaltennamen aus Rohdaten auf ein einheitliches Schema."""
     print("🔍 Analysiere und harmonisiere Spaltenstruktur...")
 
-    # Such-Mapping für potenzielle Spaltennamen in den Rohdaten
+    # Potenzielle Quell-Spaltennamen verschiedener CSV-Formate
     mapping = {}
     for col in ["date", "Datetime", "Year", "year", "Date"]:
         if col in df_matches.columns:
@@ -89,7 +77,6 @@ def harmony_columns(df_matches: pd.DataFrame) -> pd.DataFrame:
 
     df_matches = df_matches.rename(columns=mapping)
 
-    # Validierung der zwingend erforderlichen Spalten
     required_cols = [
         "date",
         "home_team",
@@ -112,15 +99,12 @@ def harmony_columns(df_matches: pd.DataFrame) -> pd.DataFrame:
 
 
 def convert_dates(df_matches: pd.DataFrame) -> pd.DataFrame:
-    """Konvertiert die Datumsspalte in datetime – unterstützt reine Jahreszahlen
-    (z.B. 2022) sowie vollständige ISO-Strings (z.B. 2026-06-11T18:00:00Z).
-    """
+    """Konvertiert die Datumsspalte – unterstützt Jahreszahlen (2022) und ISO-Strings."""
     print("📅 Konvertiere Datumsspalte (gemischte Formate möglich)...")
     df_matches["date"] = pd.to_datetime(
         df_matches["date"].astype(str), errors="coerce", utc=True
     ).dt.tz_convert(None)
 
-    # Sortieren und Zeilen ohne essenzielle Match-Daten entfernen
     df_matches = df_matches.sort_values("date").reset_index(drop=True)
     return df_matches.dropna(
         subset=["home_score", "away_score", "home_team", "away_team"]
@@ -128,10 +112,7 @@ def convert_dates(df_matches: pd.DataFrame) -> pd.DataFrame:
 
 
 def calculate_form_curves(df_matches: pd.DataFrame) -> pd.DataFrame:
-    """Berechnet dynamische Formkurven (Rolling Average der letzten 5 Spiele)
-
-    über alle historisch verfügbaren Länderspiele hinweg.
-    """
+    """Berechnet dynamische Formkurven (Rolling Average der letzten 5 Spiele)."""
     print("📈 Berechne historische Formkurven (Rolling Window: 5)...")
     team_stats = {}
     home_form_attack, home_form_defense = [], []
@@ -141,12 +122,11 @@ def calculate_form_curves(df_matches: pd.DataFrame) -> pd.DataFrame:
         home = row["home_team"]
         away = row["away_team"]
 
-        # Initialisiere Teams, falls sie zum ersten Mal auftauchen
         for team in [home, away]:
             if team not in team_stats:
                 team_stats[team] = {"scored": [], "conceded": []}
 
-        # Form vor dem Spiel sichern (Fallback auf Turnierschnitt 1.3 bei Debüt)
+        # Form-Wert VOR dem Spiel erfassen; Debüt-Teams bekommen WM-Schnitt 1.3
         home_form_attack.append(
             np.mean(team_stats[home]["scored"][-5:])
             if team_stats[home]["scored"]
@@ -168,7 +148,6 @@ def calculate_form_curves(df_matches: pd.DataFrame) -> pd.DataFrame:
             else 1.3
         )
 
-        # Historie mit den aktuellen Spielergebnissen aktualisieren
         team_stats[home]["scored"].append(row["home_score"])
         team_stats[home]["conceded"].append(row["away_score"])
         team_stats[away]["scored"].append(row["away_score"])
@@ -183,13 +162,9 @@ def calculate_form_curves(df_matches: pd.DataFrame) -> pd.DataFrame:
 
 
 def inject_host_advantage(df_matches: pd.DataFrame) -> pd.DataFrame:
-    """Injiziert ein binäres Flag (1 oder 0), falls ein Team der tatsächliche
-
-    Gastgeber der jeweiligen Weltmeisterschaft war oder sein wird.
-    """
+    """Setzt home_is_host / away_is_host = 1, falls ein Team echter WM-Gastgeber war."""
     print("🏠 Injiziere echten Heimvorteil (Identifikation der WM-Gastgeber)...")
 
-    # Offizielle Ausrichterländer der Turniere (inkl. Dreiergespann für 2026)
     world_cup_hosts = {
         2002: ["South Korea", "Japan"],
         2006: ["Germany"],
@@ -208,7 +183,6 @@ def inject_host_advantage(df_matches: pd.DataFrame) -> pd.DataFrame:
         home_team = row["home_team"]
         away_team = row["away_team"]
 
-        # Prüfen, ob das Team im entsprechenden Jahr echter Gastgeber war
         if year in world_cup_hosts and home_team in world_cup_hosts[year]:
             home_is_host.append(1)
         else:
@@ -225,15 +199,7 @@ def inject_host_advantage(df_matches: pd.DataFrame) -> pd.DataFrame:
 
 
 def aggregate_market_values(df_market: pd.DataFrame) -> pd.DataFrame:
-    """Extrahiert die Kader-Gesamtmarktwerte pro Nation aus dem WM-Datensatz.
-
-    Der neue Datensatz (wm_dataset.csv) liefert den Marktwert bereits
-    aggregiert pro Team in der Spalte 'squad_total_market_value_eur'.
-    Es ist also keine Spieler-Aggregation mehr nötig — wir ziehen den Wert
-    nur heraus, rechnen ihn in Millionen € um und gleichen die Ländernamen an.
-
-    Args:
-        df_market (pd.DataFrame): Inhalt der wm_dataset.csv.
+    """Extrahiert Kader-Gesamtmarktwerte aus wm_dataset.csv (bereits pro Team aggregiert).
 
     Returns:
         pd.DataFrame: Spalten ['team_name', 'squad_market_value'] (in Mio €).
@@ -242,15 +208,13 @@ def aggregate_market_values(df_market: pd.DataFrame) -> pd.DataFrame:
 
     squad_values = df_market[["team", "squad_total_market_value_eur"]].copy()
 
-    # Ländernamen an die Schreibweise der Match-Daten angleichen
+    # Ländernamen an die Schreibweise der Match-Daten angleichen (siehe MARKET_VALUE_NAME_MAP)
     squad_values["team"] = squad_values["team"].replace(MARKET_VALUE_NAME_MAP)
 
-    # Euro -> Millionen Euro
     squad_values["squad_market_value"] = (
         squad_values["squad_total_market_value_eur"] / 1_000_000
     ).round(1)
 
-    # Auf die zwei Spalten reduzieren, die der Merge in process_data() erwartet
     squad_values = squad_values[["team", "squad_market_value"]].rename(
         columns={"team": "team_name"}
     )
@@ -267,7 +231,6 @@ def process_data():
     live_path = config["tournaments"]["world_cup"]["live_path"]
     market_value_path = "data/raw/wm_dataset.csv"
 
-    # Datensätze einlesen
     print(f"⏳ Lade Match-Daten aus '{raw_path}'...")
     df_matches = pd.read_csv(raw_path)
     df_matches = merge_live_data(df_matches, live_path)
@@ -281,20 +244,18 @@ def process_data():
         )
         sys.exit(1)
 
-    # Sequentieller Aufruf der Transformationsschritte
     df_matches = harmony_columns(df_matches)
     df_matches = convert_dates(df_matches)
     df_matches = calculate_form_curves(df_matches)
     df_matches = inject_host_advantage(df_matches)
 
-    # Filtern auf moderne Epoche und das korrekte Turnier (Concept Drift Schutz)
+    # Nur FIFA World Cup ab 2000 — schützt vor Concept Drift durch ältere Spielstile
     if "tournament" in df_matches.columns:
         df_wc = df_matches[df_matches["tournament"] == "FIFA World Cup"].copy()
     else:
         df_wc = df_matches.copy()
     df_wc = df_wc[df_wc["date"].dt.year >= 2000].reset_index(drop=True)
 
-    # Marktwerte berechnen und in die WM-Spiele mergen
     squad_values = aggregate_market_values(df_market)
 
     print("🔀 Führe Match-Daten und aggregierte Kaderwerte zusammen...")
@@ -308,15 +269,14 @@ def process_data():
     ).drop(columns=["team_name"])
     df_wc = df_wc.rename(columns={"squad_market_value": "away_market_value"})
 
-    # Fehlende Marktwerte (z.B. kleinere Fußball-Nationen) mit dem Median auffüllen
+    # Median-Fallback für kleinere Nationen ohne Marktwert-Eintrag
     median_value = squad_values["squad_market_value"].median()
     df_wc["home_market_value"] = df_wc["home_market_value"].fillna(median_value)
     df_wc["away_market_value"] = df_wc["away_market_value"].fillna(median_value)
 
-    # Standardmäßig wird bei WMs von neutralem Boden ausgegangen
-    df_wc["neutral"] = 1
+    df_wc["neutral"] = 1  # WM-Spiele finden immer auf neutralem Boden statt
 
-    # Finale Feature-Selektion für das Modell-Training
+    # Feature-Selektion für das Modell-Training
     final_features = [
         "date",
         "home_team",

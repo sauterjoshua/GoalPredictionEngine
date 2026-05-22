@@ -1,16 +1,10 @@
 """
-dashboard.py
+Streamlit-Dashboard für die WM-2026 Tor-Vorhersagen.
 
-Streamlit-Dashboard für die WM-2026 Tor-Vorhersage-Engine.
+Reine Anzeige-Schicht: liest nur CSVs, rechnet nichts.
+Vorhersagen werden von der Dagster-Pipeline (predict.py) erzeugt.
 
-ETAPPE 2 (Basis): Zeigt die anstehenden Spiele aus predictions.csv als
-dezente, moderne Karten mit Flaggen-Emojis. Über einen Datums-Filter lässt
-sich durch die geloggte Vorhersage-Historie (prediction_history.csv) blättern.
-
-Reine Anzeige-Schicht: Das Dashboard liest nur CSVs, es rechnet nichts.
-Die Vorhersagen werden von der Dagster-Pipeline (predict.py) erzeugt.
-
-Start:  streamlit run dashboard.py   (aus dem Projekt-Root!)
+Start: streamlit run dashboard.py  (aus dem Projekt-Root)
 """
 
 from datetime import datetime
@@ -20,9 +14,6 @@ import streamlit as st
 import yaml
 
 
-# --------------------------------------------------------------------------
-# Konfiguration & Daten laden
-# --------------------------------------------------------------------------
 def load_config() -> dict:
     """Lädt die zentrale config.yaml (gleiche Pfade wie die Pipeline)."""
     with open("config.yaml", "r", encoding="utf-8") as f:
@@ -51,11 +42,7 @@ def load_history(path: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-# --------------------------------------------------------------------------
-# Flaggen-Emoji aus Ländernamen
-# --------------------------------------------------------------------------
-# Mapping Ländername -> ISO-2-Code (nur die wichtigsten WM-Nationen;
-# Fallback ist eine neutrale Flagge, falls ein Land fehlt).
+# Ländername → ISO-2-Code; Fallback in flag_emoji() ist eine weiße Flagge
 COUNTRY_TO_ISO = {
     "Germany": "DE", "France": "FR", "Spain": "ES", "Italy": "IT",
     "England": "GB", "Brazil": "BR", "Argentina": "AR", "Portugal": "PT",
@@ -71,31 +58,24 @@ COUNTRY_TO_ISO = {
 
 
 def flag_emoji(country: str) -> str:
-    """Wandelt einen Ländernamen in ein Flaggen-Emoji.
+    """Wandelt einen Ländernamen in ein Flaggen-Emoji (Fallback: 🏳️).
 
-    Flaggen-Emojis bestehen aus zwei 'Regional Indicator Symbols'.
-    Beispiel: 'DE' -> 🇩🇪. Unbekannte Länder bekommen eine weiße Flagge.
+    Flaggen bestehen aus zwei Regional Indicator Symbols (Basis 0x1F1E6 = 'A').
     """
     iso = COUNTRY_TO_ISO.get(country)
     if not iso:
         return "🏳️"
-    # 0x1F1E6 ist 'A' als Regional Indicator; Offset vom normalen Buchstaben
     return "".join(chr(0x1F1E6 + (ord(c) - ord("A"))) for c in iso.upper())
 
 
-# --------------------------------------------------------------------------
-# Karten-Darstellung
-# --------------------------------------------------------------------------
 def render_match_card(row: pd.Series):
     """Zeichnet eine einzelne Spielkarte mit Tipp, Toren, Form und Kaderwert."""
     home, away = row["home_team"], row["away_team"]
     home_flag, away_flag = flag_emoji(home), flag_emoji(away)
 
     with st.container(border=True):
-        # Datum klein oben
         st.caption(f"📅 {row['date']}")
 
-        # Drei Spalten: Heim | Tipp | Auswärts
         col_home, col_score, col_away = st.columns([3, 2, 3])
 
         with col_home:
@@ -104,7 +84,6 @@ def render_match_card(row: pd.Series):
             st.caption(f"Kaderwert: {row['home_market_value']:.0f} M€")
 
         with col_score:
-            # Großer gerundeter Tipp, darunter die exakte Erwartung
             st.markdown(
                 f"<div style='text-align:center;font-size:2.2rem;"
                 f"font-weight:700;line-height:1.1'>"
@@ -123,9 +102,6 @@ def render_match_card(row: pd.Series):
             st.caption(f"Kaderwert: {row['away_market_value']:.0f} M€")
 
 
-# --------------------------------------------------------------------------
-# Haupt-App
-# --------------------------------------------------------------------------
 def main():
     st.set_page_config(
         page_title="WM 2026 Predictions",
@@ -137,7 +113,6 @@ def main():
     predictions_path = config["tournaments"]["world_cup"]["predictions_path"]
     history_path = config["tournaments"]["world_cup"]["history_path"]
 
-    # Dezentes globales Styling
     st.markdown(
         """
         <style>
@@ -148,7 +123,6 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # ---- Header ----
     st.title("⚽ WM 2026 — Tor-Vorhersagen")
     st.markdown(
         "<p style='color:#888;margin-top:-0.6rem'>"
@@ -156,7 +130,6 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # ---- Datenquelle wählen: aktuelles Fenster oder Historie durchblättern ----
     quelle = st.radio(
         "Datenquelle",
         ["Aktuelles 3-Tage-Fenster", "Historie durchblättern"],
@@ -177,18 +150,16 @@ def main():
             st.info("📭 Noch keine Vorhersage-Historie vorhanden.")
             return
 
-        # Verfügbare Spieltage aus der Historie zur Auswahl anbieten
         verfuegbare_tage = sorted(history["date"].unique())
         gewaehlter_tag = st.select_slider(
             "Spieltag wählen", options=verfuegbare_tage, value=verfuegbare_tage[-1]
         )
 
-        # Pro Spiel die JÜNGSTE (beste) Vorhersage dieses Tages nehmen
+        # Pro Spiel nur die jüngste Vorhersage zeigen (Form kann sich zwischen Läufen ändern)
         tag_df = history[history["date"] == gewaehlter_tag].copy()
         tag_df = tag_df.sort_values("predicted_at")
         df = tag_df.groupby("match_key", as_index=False).last()
 
-    # ---- Karten rendern ----
     st.markdown(f"**{len(df)} Spiel(e)**")
     for _, row in df.iterrows():
         render_match_card(row)

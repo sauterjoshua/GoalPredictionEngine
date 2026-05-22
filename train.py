@@ -1,12 +1,6 @@
 """
-train.py
-
-Dieses Skript steuert das Modell-Training der CornerPredictionEngine.
-Es lädt die aufbereiteten WM-Daten, führt einen strikten, chronologischen
-Time-Based Split durch (Training auf historischen Daten, Test auf modernen Turnieren)
-und trainiert zwei stark regulierte XGBoost-Regressoren für Heim- und Auswärtstore.
-
-NEU: Time-Decay-Gewichtung – neuere WMs beeinflussen das Modell stärker als alte.
+Modell-Training: chronologischer Split (Train < 2018 / Test >= 2018),
+Time-Decay-Gewichtung und zwei XGBoost-Regressoren für Heim-/Auswärtstore.
 """
 
 import os
@@ -32,11 +26,8 @@ def main():
     config = load_config()
     data_path = config["tournaments"]["world_cup"]["processed_path"]
 
-    # === NEU: Decay-Rate aus Config lesen ===
-    # decay_rate steuert, wie stark alte WMs "verblassen":
-    # 0.0  = alle Spiele gleich gewichtet (Verhalten wie vorher)
-    # 0.15 = moderater Decay (Empfehlung)
-    # 0.5  = aggressiv, fast nur die letzte WM zählt
+    # decay_rate steuert, wie stark alte WMs verblassen:
+    # 0.0 = gleichgewichtet | 0.15 = moderat (Empfehlung) | 0.5 = aggressiv
     decay_rate = config["model"]["decay_rate"]
 
     print(f"⏳ Lade aufbereitete moderne WM-Daten aus '{data_path}'...")
@@ -48,7 +39,6 @@ def main():
 
     df["date"] = pd.to_datetime(df["date"])
 
-    # Exakte Feature-Liste, auf der die Bäume trainiert werden
     features = [
         "home_form_attack",
         "home_form_defense",
@@ -61,9 +51,7 @@ def main():
         "neutral",
     ]
 
-    # --- CHRONOLOGISCHER TIME-BASED SPLIT ---
-    # Zur Vermeidung von Data Leakage und für ein realistisches Backtesting
-    # trainieren wir auf den WMs 2000-2014 und testen auf den WMs 2018-2022.
+    # Chronologischer Split verhindert Data Leakage: Train 2000-2014, Test 2018-2022
     print("✂️ Führe zeitbasierten Split durch (Training < 2018 | Test >= 2018)...")
     train_df = df[df["date"].dt.year < 2018].reset_index(drop=True)
     test_df = df[df["date"].dt.year >= 2018].reset_index(drop=True)
@@ -74,7 +62,6 @@ def main():
 
     print(f"   📊 Trainings-Matches: {len(train_df)} | Test-Matches: {len(test_df)}")
 
-    # Features und Zielvariablen (Scores) trennen
     X_train = train_df[features]
     y_home_train = train_df["home_score"]
     y_away_train = train_df["away_score"]
@@ -83,25 +70,17 @@ def main():
     y_home_test = test_df["home_score"]
     y_away_test = test_df["away_score"]
 
-    # === NEU: Time-Decay-Gewichte berechnen ===
-    # Für jedes Trainings-Spiel: wie viele Jahre liegt es zurück?
-    # WICHTIG: Nur auf train_df! Testdaten dürfen nicht gewichtet werden,
-    # sonst verfälscht das die Evaluierung.
+    # Time-Decay nur auf Trainingsdaten (Testdaten niemals gewichten → verfälscht MAE)
+    # Exponentieller Decay: w = exp(-λ * years_ago)
+    # Beispiel λ=0.15: 2002 → w≈0.027 (irrelevant), 2014 → w≈0.165, 2022 → w≈0.549
     current_year = 2026
     years_ago = current_year - train_df["date"].dt.year
-
-    # Exponentieller Decay: w = exp(-λ * years_ago)
-    # Beispiel mit λ=0.15:
-    #   Spiel von 2002 (24 Jahre alt): w ≈ 0.027  (fast irrelevant)
-    #   Spiel von 2014 (12 Jahre alt): w ≈ 0.165
-    #   Spiel von 2022 (4 Jahre alt):  w ≈ 0.549
     weights = np.exp(-decay_rate * years_ago)
 
     print(f"⚖️ Time-Decay aktiv (λ={decay_rate}). "
           f"Gewichtsbereich: {weights.min():.3f} bis {weights.max():.3f}")
 
-    # --- MODELL-TRAINING (HEIMTORE) ---
-    # Stark reguliert (max_depth=3, reg_alpha/lambda), um Overfitting im Keim zu ersticken
+    # Stark reguliert (max_depth=3, reg_alpha/lambda) gegen Overfitting auf kleinem Datensatz
     print("🤖 Trainiere stark reguliertes Modell für HEIM-Tore...")
     model_home = xgb.XGBRegressor(
         n_estimators=120,
@@ -113,10 +92,8 @@ def main():
         reg_lambda=1.5,
         random_state=42,
     )
-    # === GEÄNDERT: sample_weight übergeben ===
     model_home.fit(X_train, y_home_train, sample_weight=weights)
 
-    # --- MODELL-TRAINING (AUSWÄRTSTORE) ---
     print("🤖 Trainiere stark reguliertes Modell für AUSWÄRTS-Tore...")
     model_away = xgb.XGBRegressor(
         n_estimators=120,
@@ -128,10 +105,8 @@ def main():
         reg_lambda=1.5,
         random_state=42,
     )
-    # === GEÄNDERT: sample_weight übergeben ===
     model_away.fit(X_train, y_away_train, sample_weight=weights)
 
-    # --- EVALUIERUNG ---
     pred_home = model_home.predict(X_test)
     pred_away = model_away.predict(X_test)
 
@@ -147,7 +122,6 @@ def main():
     )
     print(f"   💡 Zum Vergleich der Turnier-Dummy-Tipp: {baseline_home_mae:.2f}")
 
-    # Serialisierung (Modelle einfrieren für spätere Live-Inferenz)
     os.makedirs("models", exist_ok=True)
     joblib.dump(model_home, "models/wm_home_goals_model.pkl")
     joblib.dump(model_away, "models/wm_away_goals_model.pkl")

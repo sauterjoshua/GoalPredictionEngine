@@ -1,9 +1,7 @@
 """
-wm_pipeline/assets.py
-
-Dagster-Assets für die WM-Vorhersage-Pipeline.
-Jedes Asset entspricht einem "Datenprodukt": eine CSV-Datei, ein Modell, ein Plot.
-Dagster erkennt automatisch die Abhängigkeiten zwischen den Assets.
+Dagster-Assets der WM-Vorhersage-Pipeline.
+Jedes Asset ist ein Datenprodukt (CSV, Modell, Plot); Abhängigkeiten werden
+über `deps=` deklariert und von Dagster automatisch aufgelöst.
 """
 
 from dagster import (
@@ -21,18 +19,12 @@ from dagster import (
 
 @asset
 def wm2026_live_data(context: AssetExecutionContext) -> MaterializeResult:
-    """
-    Live-Daten der WM 2026 von football-data.org.
-    
-    Wird bei jeder Pipeline-Ausführung neu von der API geholt.
-    Während der WM wird das automatisch immer aktueller.
-    """
+    """Live-Daten der WM 2026 von football-data.org (bei jedem Lauf neu geholt)."""
     from .data_sources import fetch_world_cup_2026_matches, save_matches_to_csv
 
     df = fetch_world_cup_2026_matches()
     output_path = save_matches_to_csv(df)
 
-    # Zähle, wie viele Spiele schon abgeschlossen sind
     finished_count = (df["status"] == "FINISHED").sum()
     total_count = len(df)
 
@@ -41,7 +33,7 @@ def wm2026_live_data(context: AssetExecutionContext) -> MaterializeResult:
         f"davon {finished_count} bereits abgeschlossen."
     )
 
-    # Diese Metadaten erscheinen in der Dagster-UI als kleine Statistik-Kacheln
+    # Statistik-Kacheln in der Dagster-UI
     return MaterializeResult(
         metadata={
             "total_matches": MetadataValue.int(int(total_count)),
@@ -53,12 +45,7 @@ def wm2026_live_data(context: AssetExecutionContext) -> MaterializeResult:
     
 @asset(deps=[wm2026_live_data])
 def cleaned_wm_data(context: AssetExecutionContext):
-    """
-    Erstes Asset: Bereinigte WM-Daten.
-    
-    Wrappt prepare_data.py. Hängt jetzt von wm2026_live_data ab —
-    das stellt sicher, dass die neuesten WM-Spiele vor dem Cleaning geholt werden.
-    """
+    """Bereinigte WM-Daten (Wrapper um prepare_data.py)."""
     from prepare_data import process_data
     process_data()
     context.log.info("✅ WM-Daten erfolgreich aufbereitet.")
@@ -66,12 +53,7 @@ def cleaned_wm_data(context: AssetExecutionContext):
 
 @asset(deps=[cleaned_wm_data])
 def trained_models(context: AssetExecutionContext):
-    """
-    Zweites Asset: Trainierte XGBoost-Modelle.
-    
-    Hängt von cleaned_wm_data ab — Dagster sorgt automatisch dafür,
-    dass die Daten vor dem Training fertig sind.
-    """
+    """Trainierte XGBoost-Modelle (Wrapper um train.py)."""
     from train import main as train_main
     train_main()
     context.log.info("✅ Modelle erfolgreich trainiert.")
@@ -79,43 +61,28 @@ def trained_models(context: AssetExecutionContext):
 
 @asset(deps=[trained_models])
 def diagnostic_plots(context: AssetExecutionContext):
-    """
-    Drittes Asset: Diagnose-Plots.
-    
-    Hängt von trained_models ab — Plots können nur erstellt werden,
-    wenn die Modelle existieren.
-    """
+    """Diagnose-Plots im Ordner 'plots/' (Wrapper um visualize.py)."""
     from visualize import main as visualize_main
     visualize_main()
     context.log.info("✅ Diagnose-Plots generiert.")
     
 
-# === JOB DEFINITION ===
-# Ein Job ist eine ausführbare Bündelung aller Assets.
-# AssetSelection.all() bedeutet: nimm wirklich alle definierten Assets.
 wm_pipeline_job = define_asset_job(
     name="wm_pipeline_job",
-    selection="*",  # "*" = alle Assets
+    selection="*",  # alle Assets
 )
 
 
-# === SENSOR DEFINITION ===
-# Pollt alle 5 Minuten die API und triggert den Job, sobald neue
-# FINISHED-Spiele aufgetaucht sind — ersetzt den festen 12h-Schedule.
+# Pollt alle 5 Minuten; triggert den Job sobald neue FINISHED-Spiele auftauchen
 @sensor(
     job=wm_pipeline_job,
-    minimum_interval_seconds=300,  # alle 5 Minuten
+    minimum_interval_seconds=300,
     description="Triggert die Pipeline, sobald ein neues Spiel FINISHED ist.",
 )
 def new_finished_matches_sensor(context: SensorEvaluationContext):
-    """
-    Cursor-Strategie: speichert die Anzahl bekannter FINISHED-Spiele als
-    Integer-String. Bleibt über Daemon-Neustarts hinweg erhalten.
-    """
-    # 1. Cursor lesen (letzter bekannter FINISHED-Count)
+    """Cursor = Anzahl bekannter FINISHED-Spiele (bleibt über Daemon-Neustarts erhalten)."""
     last_count = int(context.cursor) if context.cursor else 0
 
-    # 2. API fragen — gibt einen DataFrame zurück
     try:
         from .data_sources import fetch_world_cup_2026_matches
         df = fetch_world_cup_2026_matches()
@@ -123,15 +90,10 @@ def new_finished_matches_sensor(context: SensorEvaluationContext):
     except Exception as exc:
         return SkipReason(f"API-Fehler beim Abrufen der WM-Daten: {exc}")
 
-    # 3. Logging — sichtbar in Dagster-UI unter Sensors → Ticks
-    context.log.info(
-        f"FINISHED-Spiele: {current_count} (vorher: {last_count})"
-    )
+    context.log.info(f"FINISHED-Spiele: {current_count} (vorher: {last_count})")
 
-    # 4. Entscheiden
     if current_count > last_count:
-        # Cursor VOR dem RunRequest setzen: verhindert Endlos-Retriggern
-        # falls der Job selbst fehlschlägt.
+        # Cursor VOR dem RunRequest setzen, damit ein Job-Fehler kein Endlos-Retriggern auslöst
         context.update_cursor(str(current_count))
         return RunRequest(
             run_key=f"finished_count_{current_count}",

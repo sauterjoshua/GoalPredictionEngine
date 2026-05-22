@@ -1,9 +1,4 @@
-"""
-wm_pipeline/data_sources.py
-
-Funktionen zum Abrufen von Live-Daten aus externen APIs.
-Aktuell: football-data.org für WM 2026 Spielergebnisse.
-"""
+"""Live-Daten von football-data.org für WM 2026 Spielergebnisse."""
 
 import os
 import requests
@@ -11,23 +6,20 @@ import pandas as pd
 from dotenv import load_dotenv
 
 
-# Lädt .env beim Import dieses Moduls
 load_dotenv()
 
-# API-Konfiguration
 FOOTBALL_DATA_TOKEN = os.getenv("FOOTBALL_DATA_TOKEN")
 API_BASE_URL = "https://api.football-data.org/v4"
 
 
 def fetch_world_cup_2026_matches() -> pd.DataFrame:
-    """
-    Holt alle bekannten Spiele der WM 2026 von football-data.org.
-    
-    Gibt einen DataFrame zurück mit Spalten passend zum bestehenden Format:
-    date, home_team, away_team, home_score, away_score, tournament
-    
-    Hinweis: Vor WM-Start gibt's nur die geplanten Spiele (ohne Scores).
-    Während/nach WM sind die Scores gefüllt.
+    """Holt alle WM-2026-Spiele von football-data.org.
+
+    Vor WM-Start: nur geplante Spiele ohne Scores.
+    Während/nach WM: Scores sind gefüllt.
+
+    Returns:
+        DataFrame mit Spalten: date, home_team, away_team, home_score, away_score, status
     """
     if not FOOTBALL_DATA_TOKEN:
         raise ValueError(
@@ -35,7 +27,6 @@ def fetch_world_cup_2026_matches() -> pd.DataFrame:
             "Bitte .env-Datei im Projekt-Root anlegen."
         )
 
-    # API-Endpoint für WM-Matches
     url = f"{API_BASE_URL}/competitions/WC/matches"
     headers = {"X-Auth-Token": FOOTBALL_DATA_TOKEN}
 

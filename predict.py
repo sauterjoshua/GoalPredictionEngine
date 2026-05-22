@@ -1,15 +1,9 @@
 """
-predict.py
+Inferenz-Phase der Engine: lädt Modelle und prognostiziert WM-Ergebnisse.
 
-Dieses Skript steuert die Inferenz-Phase (Live-Vorhersage) der Engine.
-Es lädt die fertig trainierten Modelle und prognostiziert WM-Ergebnisse.
-
-Zwei Betriebsmodi:
-  1. CLI-Einzelvorhersage:  python predict.py 'Germany' 'France'
-  2. Batch-Vorhersage:      run_batch_prediction() rechnet alle anstehenden
-     Spiele der nächsten N Tage und schreibt sie in eine CSV (für Dashboard).
-
-Marktwerte, aktuelle Form und das Gastgeber-Flag werden automatisch ermittelt.
+Modi:
+  CLI:   python predict.py 'Germany' 'France'
+  Batch: run_batch_prediction()  →  nächste N Tage → predictions.csv
 """
 
 import sys
@@ -32,29 +26,22 @@ def load_config() -> dict:
 
 
 def get_latest_team_stats(team: str, df: pd.DataFrame) -> tuple[float, float, float]:
-    """Berechnet die aktuelle Form eines Teams aus seinen letzten 5 Spielen.
+    """Berechnet Form + Marktwert eines Teams aus seinen letzten 5 Spielen.
 
-    Die Form-Werte werden FRISCH aus den Ergebnissen berechnet (inkl. des
-    jüngsten Spiels), statt die vor-Spiel-Form aus der Tabelle auszulesen.
-    Dadurch fließt z.B. ein gerade gespieltes WM-Gruppenspiel direkt in die
-    nächste Vorhersage ein.
-
-    Args:
-        team (str): Der Name der Nationalmannschaft.
-        df (pd.DataFrame): Der aufbereitete Datensatz (cleaned_wm_data.csv).
+    Form wird FRISCH aus Ergebnissen berechnet (inkl. jüngstem Spiel), damit
+    ein gerade gespieltes Gruppenspiel sofort in die nächste Vorhersage einfließt.
 
     Returns:
         tuple: (form_attack, form_defense, market_value)
     """
-    # Filtere alle Spiele, an denen das Team beteiligt war, chronologisch sortiert
     team_df = df[(df["home_team"] == team) | (df["away_team"] == team)].sort_values("date")
 
-    # Fallback-Logik für Teams, die nicht im Datensatz existieren
+    # Unbekanntes Team → Median-Marktwert und WM-Durchschnitts-Form als Fallback
     if team_df.empty:
         median_market_value = df["home_market_value"].median()
         return 1.3, 1.3, float(median_market_value)
 
-    # Tore aus Sicht des Teams sammeln (egal ob es Heim oder Auswärts spielte)
+    # Tore aus Sicht des Teams (egal ob Heim oder Auswärts)
     scored, conceded = [], []
     for _, row in team_df.iterrows():
         if row["home_team"] == team:
@@ -64,11 +51,10 @@ def get_latest_team_stats(team: str, df: pd.DataFrame) -> tuple[float, float, fl
             scored.append(row["away_score"])
             conceded.append(row["home_score"])
 
-    # Form = Durchschnitt der letzten 5 Spiele (inkl. jüngstem Ergebnis!)
     form_attack = float(np.mean(scored[-5:]))
     form_defense = float(np.mean(conceded[-5:]))
 
-    # Marktwert aus dem jüngsten Spiel ziehen (ändert sich nur langsam)
+    # Marktwert aus dem jüngsten Spiel (ändert sich nur langsam zwischen Turnieren)
     last_game = team_df.iloc[-1]
     if last_game["home_team"] == team:
         market_value = float(last_game["home_market_value"])
@@ -80,24 +66,10 @@ def get_latest_team_stats(team: str, df: pd.DataFrame) -> tuple[float, float, fl
 
 def predict_match(home_team: str, away_team: str, model_home, model_away,
                   df: pd.DataFrame) -> dict:
-    """Rechnet die Tor-Vorhersage für EIN Spiel.
-
-    Zentrale Inferenz-Logik, die sowohl von der CLI-Einzelvorhersage als auch
-    von der Batch-Vorhersage genutzt wird (kein duplizierter Code).
-
-    Args:
-        home_team, away_team (str): Die beiden Mannschaften.
-        model_home, model_away: Die geladenen XGBoost-Modelle.
-        df (pd.DataFrame): Der aufbereitete Datensatz für die Form-Ermittlung.
-
-    Returns:
-        dict: Vorhersage-Ergebnis mit Toren, Form und Kaderwerten.
-    """
-    # Features der beiden Teams ermitteln
+    """Tor-Vorhersage für ein einzelnes Spiel (CLI- und Batch-Modus teilen diese Logik)."""
     home_attack, home_defense, home_val = get_latest_team_stats(home_team, df)
     away_attack, away_defense, away_val = get_latest_team_stats(away_team, df)
 
-    # Input-DataFrame exakt in der Struktur aufbauen, wie es XGBoost erwartet
     input_data = pd.DataFrame([{
         "home_form_attack": home_attack,
         "home_form_defense": home_defense,
@@ -110,7 +82,6 @@ def predict_match(home_team: str, away_team: str, model_home, model_away,
         "neutral": 1
     }])
 
-    # Kontinuierliche Tor-Erwartung berechnen (Negative Werte via max(0, x) abfangen)
     pred_home_goals = max(0.0, float(model_home.predict(input_data)[0]))
     pred_away_goals = max(0.0, float(model_away.predict(input_data)[0]))
 
@@ -129,14 +100,7 @@ def predict_match(home_team: str, away_team: str, model_home, model_away,
 
 
 def load_models_and_data():
-    """Lädt die serialisierten Modelle und den aufbereiteten Datensatz.
-
-    Returns:
-        tuple: (model_home, model_away, df)
-
-    Raises:
-        FileNotFoundError: Wenn Modelle oder Daten fehlen.
-    """
+    """Lädt die serialisierten XGBoost-Modelle und den aufbereiteten Datensatz."""
     model_home = joblib.load("models/wm_home_goals_model.pkl")
     model_away = joblib.load("models/wm_away_goals_model.pkl")
     df = pd.read_csv("data/processed/cleaned_wm_data.csv")
@@ -144,23 +108,20 @@ def load_models_and_data():
 
 
 def log_predictions_to_history(predictions_df: pd.DataFrame, history_path: str):
-    """Hängt neue Vorhersagen an die History-CSV an — aber nur, wenn sich die
-    exakten Tor-Erwartungen gegenüber dem letzten Eintrag des Spiels geändert haben.
+    """Hängt neue Vorhersagen an die History-CSV an.
 
-    Args:
-        predictions_df (pd.DataFrame): Die aktuellen Vorhersagen aus dem Batch-Lauf.
-        history_path (str): Pfad zur prediction_history.csv.
+    Schreibt nur, wenn sich die exakten Tor-Erwartungen gegenüber dem letzten
+    Eintrag geändert haben (verhindert Duplikate bei unveränderter Form).
     """
     now_stamp = datetime.now().isoformat(timespec="seconds")
 
-    # Match-Key bauen: eindeutige Spiel-ID für späteren Join mit Ergebnissen
+    # match_key = eindeutige Spiel-ID für späteren Join mit echten Ergebnissen
     df_new = predictions_df.copy()
     df_new["match_key"] = (
         df_new["date"] + "_" + df_new["home_team"] + "_" + df_new["away_team"]
     )
     df_new["predicted_at"] = now_stamp
 
-    # Bestehende History laden (falls vorhanden)
     if os.path.exists(history_path):
         history = pd.read_csv(history_path)
     else:
@@ -170,16 +131,14 @@ def log_predictions_to_history(predictions_df: pd.DataFrame, history_path: str):
     for _, row in df_new.iterrows():
         key = row["match_key"]
 
-        # Letzten Eintrag für dieses Spiel suchen
         if not history.empty and key in history["match_key"].values:
             last = history[history["match_key"] == key].iloc[-1]
-            # Vergleich der EXAKTEN Tor-Erwartungen
             unchanged = (
                 abs(last["pred_home_goals"] - row["pred_home_goals"]) < 1e-9
                 and abs(last["pred_away_goals"] - row["pred_away_goals"]) < 1e-9
             )
             if unchanged:
-                continue  # nichts Neues → skip
+                continue
 
         rows_to_append.append(row)
 
@@ -193,26 +152,20 @@ def log_predictions_to_history(predictions_df: pd.DataFrame, history_path: str):
     
     
 def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
-    """Rechnet Vorhersagen für alle anstehenden Spiele der nächsten N Tage.
-
-    Liest die anstehenden (TIMED) Spiele aus der Live-CSV, filtert auf das
-    Zeitfenster [reference_date, reference_date + window] und schreibt die
-    Vorhersagen in eine CSV (für das spätere Dashboard).
+    """Rechnet Vorhersagen für alle TIMED-Spiele im Fenster [heute, heute + N Tage].
 
     Args:
-        reference_date (str | None): Referenzdatum im Format 'YYYY-MM-DD'.
-            Wenn None, wird das heutige Datum verwendet. Nützlich zum Testen,
-            wenn die WM real noch nicht begonnen hat.
+        reference_date: 'YYYY-MM-DD' zum Testen; None = heute.
 
     Returns:
-        pd.DataFrame: Die berechneten Vorhersagen (kann leer sein).
+        pd.DataFrame: Berechnete Vorhersagen (kann leer sein).
     """
     config = load_config()
     live_path = config["tournaments"]["world_cup"]["live_path"]
     predictions_path = config["tournaments"]["world_cup"]["predictions_path"]
     window_days = config.get("prediction", {}).get("prediction_window_days", 3)
 
-    # Spaltenschema für die Output-CSV (auch im Leer-Fall, damit Dashboard es lesen kann)
+    # Festes Schema auch im Leer-Fall, damit das Dashboard die CSV korrekt liest
     output_columns = [
         "date", "home_team", "away_team",
         "pred_home_goals", "pred_away_goals", "tipp_home", "tipp_away",
@@ -220,7 +173,6 @@ def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
         "home_market_value", "away_market_value",
     ]
 
-    # Referenzdatum bestimmen (heute oder Test-Override)
     if reference_date is None:
         now = datetime.now()
     else:
@@ -228,29 +180,27 @@ def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
     window_end = now + timedelta(days=window_days)
     print(f"📅 Vorhersage-Fenster: {now.date()} bis {window_end.date()} ({window_days} Tage)")
 
-    # Anstehende Spiele aus der Live-CSV laden
     df_live = pd.read_csv(live_path)
     df_upcoming = df_live[df_live["status"] == "TIMED"].copy()
 
-    # Datum parsen (TIMED-Spiele haben volles ISO-Format wie 2026-06-14T17:00:00Z)
-    # utc=True macht die Zeitzone konsistent; danach tz entfernen für Vergleich
+    # utc=True normalisiert ISO-Timestamps (z.B. 2026-06-14T17:00:00Z);
+    # tz_localize(None) entfernt die Timezone für den Vergleich mit datetime.now()
     df_upcoming["date"] = pd.to_datetime(
         df_upcoming["date"], errors="coerce", utc=True
     ).dt.tz_localize(None)
     df_upcoming = df_upcoming.dropna(subset=["date"])
 
-    # Auf das Zeitfenster der nächsten N Tage filtern
     mask = (df_upcoming["date"] >= now) & (df_upcoming["date"] <= window_end)
     df_window = df_upcoming[mask].sort_values("date")
 
-    # Leer-Fall: CSV mit Headern schreiben, Dashboard zeigt dann "keine Spiele"
+    # Leere CSV mit Headern schreiben → Dashboard kann sie trotzdem einlesen
     if df_window.empty:
         print("ℹ️ Keine Spiele im Vorhersage-Fenster. Schreibe leere CSV.")
         empty_df = pd.DataFrame(columns=output_columns)
         empty_df.to_csv(predictions_path, index=False)
         return empty_df
 
-    # Modelle + Datensatz einmal laden (nicht pro Spiel!)
+    # Einmalig laden, nicht pro Spiel
     model_home, model_away, df = load_models_and_data()
 
     print(f"🔮 Rechne Vorhersagen für {len(df_window)} Spiel(e)...")
@@ -259,11 +209,9 @@ def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
         pred = predict_match(
             match["home_team"], match["away_team"], model_home, model_away, df
         )
-        # Spieldatum für die Ausgabe ergänzen
         pred["date"] = match["date"].date().isoformat()
         results.append(pred)
 
-    # In definierter Spaltenreihenfolge speichern
     predictions_df = pd.DataFrame(results)[output_columns]
     predictions_df.to_csv(predictions_path, index=False)
     print(f"✅ {len(predictions_df)} Vorhersage(n) gespeichert: '{predictions_path}'")
@@ -291,10 +239,8 @@ def main():
         print("   Bitte führe zuerst prepare_data.py und train.py aus.")
         sys.exit(1)
 
-    # Zentrale Vorhersage-Logik nutzen (gleiche wie Batch-Modus)
     pred = predict_match(home_team, away_team, model_home, model_away, df)
 
-    # Formatiertes Terminal-Dashboard ausgeben
     print("\n" + "=" * 55)
     print(f"🔮 PREDICTION ENGINE — WM 2026 SIMULATION:")
     print(f"   {home_team} vs. {away_team}")

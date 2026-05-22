@@ -1,10 +1,7 @@
 """
-visualize.py
-
-Dieses Skript ist für die Modell-Diagnostik und Qualitätskontrolle zustabel.
-Es lädt die trainierten XGBoost-Modelle sowie die Testdaten (WM 2018 & 2022)
-und generiert vier mathematische Analyse-Grafiken im Ordner 'plots/',
-die das Verhalten der KI ungeschönt offenlegen.
+Modell-Diagnostik: lädt trainierte XGBoost-Modelle und generiert
+Analyse-Grafiken (Feature Importance, Actual vs. Predicted, Residuen u.a.)
+im Ordner 'plots/'.
 """
 
 import sys
@@ -19,11 +16,7 @@ from sklearn.metrics import confusion_matrix
 
 
 def load_data_and_models() -> tuple:
-    """Lädt die aufbereiteten Daten und die frosch trainierten Modelle.
-
-    Returns:
-        tuple: (DataFrame, home_model, away_model) oder (None, None, None) bei Fehler.
-    """
+    """Lädt die aufbereiteten Daten und die trainierten Modelle."""
     try:
         df = pd.read_csv("data/processed/cleaned_wm_data.csv")
         df["date"] = pd.to_datetime(df["date"])
@@ -65,15 +58,13 @@ def plot_actual_vs_predicted(y_home_true, y_away_true, pred_home, pred_away):
     """Visualisiert die Regression zur Mitte (Wahrheit vs. Vorhersage)."""
     print("🎨 2/4 Generiere Actual-vs-Predicted-Plot...")
     plt.figure(figsize=(10, 5))
-    
-    # Minimaler Gauß'scher Jitter, um die Punktdichte bei Ganzzahlen sichtbar zu machen
+    # Kleiner Gauß-Jitter macht die Punktdichte bei diskreten Torwerten sichtbar
     jitter_home = np.random.normal(0, 0.08, size=len(y_home_true))
     jitter_away = np.random.normal(0, 0.08, size=len(y_away_true))
     
     plt.scatter(y_home_true + jitter_home, pred_home, alpha=0.6, color="#6a1b9a", label="Heimtore")
     plt.scatter(y_away_true + jitter_away, pred_away, alpha=0.6, color="#d32f2f", label="Auswärtstore")
-    
-    # Zeichnen der perfekten Identitätslinie (y = x)
+
     max_val = int(max(y_home_true.max(), y_away_true.max()))
     plt.plot([0, max_val], [0, max_val], color="black", linestyle="--", linewidth=1.5, label="Perfekte Vorhersage")
     
@@ -87,11 +78,9 @@ def plot_actual_vs_predicted(y_home_true, y_away_true, pred_home, pred_away):
 
 
 def plot_confusion_matrix(y_true, pred_continuous):
-    """Erstellt eine Heatmap der gerundeten exakten Tortipps."""
+    """Erstellt eine Heatmap der gerundeten Tortipps (max. 4 Tore für Übersicht)."""
     print("🎨 3/4 Generiere Ergebnis-Matrix-Heatmap...")
     pred_round = np.round(pred_continuous).astype(int)
-    
-    # Beschränkung der Matrix auf max 4 Tore für maximale Übersicht im Plot
     cm = confusion_matrix(y_true, pred_round, labels=[0, 1, 2, 3, 4])
     
     plt.figure(figsize=(8, 6))
@@ -114,8 +103,6 @@ def plot_residuals(y_home_true, y_away_true, pred_home, pred_away):
     plt.figure(figsize=(10, 5))
     sns.histplot(residuals_home, kde=True, color="#6a1b9a", label="Fehler Heimtore", alpha=0.5, bins=15)
     sns.histplot(residuals_away, kde=True, color="#d32f2f", label="Fehler Auswärtstore", alpha=0.5, bins=15)
-    
-    # Die Null-Linie zeigt an, wo der Fehler 0 wäre
     plt.axvline(x=0, color="black", linestyle="--", linewidth=1.5)
     plt.title("Fehler-Anatomie: Verteilung der Abweichungen (Residuen)", fontsize=12, fontweight="bold", pad=15)
     plt.xlabel("Abweichung (Tatsächliche Tore - Vorhersage)")
@@ -217,12 +204,10 @@ def plot_mae_over_time(eval_df: pd.DataFrame):
         plt.axis("off")
     else:
         df = eval_df.sort_values("date").reset_index(drop=True)
-        # Absoluter Fehler pro Spiel (Heim + Auswärts gemittelt)
         df["abs_err"] = (
             (df["pred_home_goals"] - df["real_home"]).abs()
             + (df["pred_away_goals"] - df["real_away"]).abs()
         ) / 2.0
-        # Kumulierter MAE = laufender Durchschnitt
         df["cum_mae"] = df["abs_err"].expanding().mean()
  
         x = range(1, len(df) + 1)
@@ -257,7 +242,6 @@ def plot_prediction_evolution(top_n: int = 6):
         history = pd.read_csv(paths["history"])
         history["predicted_at"] = pd.to_datetime(history["predicted_at"])
  
-        # Spiele mit den meisten Vorhersage-Zeitpunkten auswählen
         counts = history.groupby("match_key").size().sort_values(ascending=False)
         top_keys = counts[counts >= 2].head(top_n).index.tolist()
  
@@ -293,20 +277,16 @@ def main():
         "home_market_value", "away_market_value", "home_is_host", "away_is_host", "neutral"
     ]
     
-    # Isolation der Out-of-Time Testdaten (WM 2018 & 2022)
     test_df = df[df["date"].dt.year >= 2018].reset_index(drop=True)
     X_test = test_df[features]
     y_home_true = test_df["home_score"]
     y_away_true = test_df["away_score"]
-    
-    # Inferenz auf Testset ausführen (Negative Vorhersagen via clip auf 0 abfangen)
+
     pred_home = np.clip(model_home.predict(X_test), 0, None)
     pred_away = np.clip(model_away.predict(X_test), 0, None)
-    
-    # Globales Styling für die Plots festlegen
+
     sns.set_theme(style="whitegrid")
-    
-    # Aufruf der einzelnen Plot-Funktionen
+
     plot_feature_importance(features, model_home, model_away)
     plot_actual_vs_predicted(y_home_true, y_away_true, pred_home, pred_away)
     plot_confusion_matrix(y_home_true, pred_home)
