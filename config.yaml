@@ -6,6 +6,7 @@ tournaments:
     processed_path: "data/processed/cleaned_wm_data.csv"
     live_path: "data/raw/wm2026_live.csv"
     predictions_path: "data/processed/predictions.csv"
+    history_path: "data/processed/prediction_history.csv"
 
 model:
   decay_rate: 0.15

@@ -13,6 +13,7 @@ Marktwerte, aktuelle Form und das Gastgeber-Flag werden automatisch ermittelt.
 """
 
 import sys
+import os
 from datetime import datetime, timedelta
 
 import joblib
@@ -142,6 +143,55 @@ def load_models_and_data():
     return model_home, model_away, df
 
 
+def log_predictions_to_history(predictions_df: pd.DataFrame, history_path: str):
+    """Hängt neue Vorhersagen an die History-CSV an — aber nur, wenn sich die
+    exakten Tor-Erwartungen gegenüber dem letzten Eintrag des Spiels geändert haben.
+
+    Args:
+        predictions_df (pd.DataFrame): Die aktuellen Vorhersagen aus dem Batch-Lauf.
+        history_path (str): Pfad zur prediction_history.csv.
+    """
+    now_stamp = datetime.now().isoformat(timespec="seconds")
+
+    # Match-Key bauen: eindeutige Spiel-ID für späteren Join mit Ergebnissen
+    df_new = predictions_df.copy()
+    df_new["match_key"] = (
+        df_new["date"] + "_" + df_new["home_team"] + "_" + df_new["away_team"]
+    )
+    df_new["predicted_at"] = now_stamp
+
+    # Bestehende History laden (falls vorhanden)
+    if os.path.exists(history_path):
+        history = pd.read_csv(history_path)
+    else:
+        history = pd.DataFrame()
+
+    rows_to_append = []
+    for _, row in df_new.iterrows():
+        key = row["match_key"]
+
+        # Letzten Eintrag für dieses Spiel suchen
+        if not history.empty and key in history["match_key"].values:
+            last = history[history["match_key"] == key].iloc[-1]
+            # Vergleich der EXAKTEN Tor-Erwartungen
+            unchanged = (
+                abs(last["pred_home_goals"] - row["pred_home_goals"]) < 1e-9
+                and abs(last["pred_away_goals"] - row["pred_away_goals"]) < 1e-9
+            )
+            if unchanged:
+                continue  # nichts Neues → skip
+
+        rows_to_append.append(row)
+
+    if not rows_to_append:
+        print("ℹ️ History: keine geänderten Vorhersagen, nichts angehängt.")
+        return
+
+    updated = pd.concat([history, pd.DataFrame(rows_to_append)], ignore_index=True)
+    updated.to_csv(history_path, index=False)
+    print(f"📝 History: {len(rows_to_append)} neue Vorhersage(n) geloggt → '{history_path}'")
+    
+    
 def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
     """Rechnet Vorhersagen für alle anstehenden Spiele der nächsten N Tage.
 
@@ -218,6 +268,9 @@ def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
     predictions_df.to_csv(predictions_path, index=False)
     print(f"✅ {len(predictions_df)} Vorhersage(n) gespeichert: '{predictions_path}'")
 
+    history_path = config["tournaments"]["world_cup"]["history_path"]
+    log_predictions_to_history(predictions_df, history_path)
+    
     return predictions_df
 
 
