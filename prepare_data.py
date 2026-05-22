@@ -14,6 +14,13 @@ import numpy as np
 import pandas as pd
 import yaml
 
+MARKET_VALUE_NAME_MAP = {
+    "Czech Republic": "Czechia",
+    "DR Congo": "Congo DR",
+    "Bosnia and Herzegovina": "Bosnia-Herzegovina",
+    "Cape Verde": "Cape Verde Islands",
+    "Cura?o": "Curaçao",  
+}
 
 def load_config() -> dict:
     """Lädt die zentrale Konfigurationsdatei (config.yaml).
@@ -218,40 +225,37 @@ def inject_host_advantage(df_matches: pd.DataFrame) -> pd.DataFrame:
 
 
 def aggregate_market_values(df_market: pd.DataFrame) -> pd.DataFrame:
-    """Aggregiert Einzelspieler-Marktwerte zu einem Gesamt-Kaderwert.
-    
-    Verhindert Duplikate durch Mehrfachnennungen desselben Spielers (Klon-Armee-Schutz).
+    """Extrahiert die Kader-Gesamtmarktwerte pro Nation aus dem WM-Datensatz.
+
+    Der neue Datensatz (wm_dataset.csv) liefert den Marktwert bereits
+    aggregiert pro Team in der Spalte 'squad_total_market_value_eur'.
+    Es ist also keine Spieler-Aggregation mehr nötig — wir ziehen den Wert
+    nur heraus, rechnen ihn in Millionen € um und gleichen die Ländernamen an.
+
+    Args:
+        df_market (pd.DataFrame): Inhalt der wm_dataset.csv.
+
+    Returns:
+        pd.DataFrame: Spalten ['team_name', 'squad_market_value'] (in Mio €).
     """
-    print("💰 Aggregiere Spieler-Marktwerte zu nationalen Kaderwerten (Top 26)...")
+    print("💰 Extrahiere Kader-Marktwerte pro Nation (in Mio €)...")
 
-    # 1. Identifiziere die Spalte für den Spielernamen
-    name_col = None
-    for col in ["player_name", "short_name", "long_name", "name", "Player"]:
-        if col in df_market.columns:
-            name_col = col
-            break
+    squad_values = df_market[["team", "squad_total_market_value_eur"]].copy()
 
-    # Erst nach Marktwert sortieren (höchste Werte nach oben)
-    df_market_sorted = df_market.sort_values("market_value_million_eur", ascending=False)
+    # Ländernamen an die Schreibweise der Match-Daten angleichen
+    squad_values["team"] = squad_values["team"].replace(MARKET_VALUE_NAME_MAP)
 
-    # 2. Wenn eine Namensspalte existiert, Duplikate desselben Spielers löschen
-    if name_col:
-        print(f"   ℹ️ Duplikate werden basierend auf der Spalte '{name_col}' entfernt...")
-        df_market_sorted = df_market_sorted.drop_duplicates(subset=[name_col, "nationality"], keep="first")
-    else:
-        print("   ⚠️ Warnung: Keine Namensspalte gefunden. Werte könnten verzerrt sein.")
+    # Euro -> Millionen Euro
+    squad_values["squad_market_value"] = (
+        squad_values["squad_total_market_value_eur"] / 1_000_000
+    ).round(1)
 
-    # Jetzt erst die Top 26 Spieler pro Nation herausschneiden
-    top_26_players = df_market_sorted.groupby("nationality").head(26)
-
-    # Kumulierten Gesamtwert pro Nation berechnen
-    squad_values = (
-        top_26_players.groupby("nationality")["market_value_million_eur"]
-        .sum()
-        .reset_index()
+    # Auf die zwei Spalten reduzieren, die der Merge in process_data() erwartet
+    squad_values = squad_values[["team", "squad_market_value"]].rename(
+        columns={"team": "team_name"}
     )
-    squad_values['market_value_million_eur'] = squad_values['market_value_million_eur'] / 4
-    squad_values.columns = ['team_name', 'squad_market_value']
+
+    print(f"   ✅ {len(squad_values)} Nationen mit Marktwert geladen.")
     return squad_values
 
 
@@ -261,7 +265,7 @@ def process_data():
     raw_path = config["tournaments"]["world_cup"]["raw_path"]
     processed_path = config["tournaments"]["world_cup"]["processed_path"]
     live_path = config["tournaments"]["world_cup"]["live_path"]
-    market_value_path = "data/raw/fifa_player_performance_market_value.csv"
+    market_value_path = "data/raw/wm_dataset.csv"
 
     # Datensätze einlesen
     print(f"⏳ Lade Match-Daten aus '{raw_path}'...")
