@@ -142,3 +142,11 @@ def new_finished_matches_sensor(context: SensorEvaluationContext):
         f"Keine neuen FINISHED-Spiele ({current_count}). "
         f"Nächster Check in ~5 Minuten."
     )
+    
+@asset(deps=["trained_models"])
+def match_predictions(context):
+    from predict import run_batch_prediction
+    df = run_batch_prediction()  # nutzt heute() als Referenzdatum
+    return MaterializeResult(
+        metadata={"predicted_matches": len(df)}
+    )
