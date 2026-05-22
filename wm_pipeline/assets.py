@@ -150,3 +150,12 @@ def match_predictions(context):
     return MaterializeResult(
         metadata={"predicted_matches": len(df)}
     )
+    
+@asset(deps=["match_predictions"])
+def telegram_notification(context):
+    from notify import run_notification
+    count = run_notification()
+    context.log.info(f"{count} Spiel(e) per Telegram benachrichtigt")
+    return MaterializeResult(
+        metadata={"notified_matches": MetadataValue.int(count)}
+    )

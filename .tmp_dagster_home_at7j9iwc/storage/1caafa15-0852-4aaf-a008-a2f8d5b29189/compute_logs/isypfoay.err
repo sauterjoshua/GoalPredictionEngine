@@ -1,0 +1,8 @@
+[32m2026-05-22 11:35:47 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 1caafa15-0852-4aaf-a008-a2f8d5b29189 - 154162 - LOGS_CAPTURED - Capturing logs for process (pid: 154162).
+[32m2026-05-22 11:35:47 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 1caafa15-0852-4aaf-a008-a2f8d5b29189 - 154162 - cleaned_wm_data - STEP_START - Started execution of step "cleaned_wm_data".
+[32m2026-05-22 11:35:48 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - 1caafa15-0852-4aaf-a008-a2f8d5b29189 - cleaned_wm_data - ✅ WM-Daten erfolgreich aufbereitet.
+[32m2026-05-22 11:35:48 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 1caafa15-0852-4aaf-a008-a2f8d5b29189 - 154162 - cleaned_wm_data - STEP_OUTPUT - Yielded output "result" of type "Any". (Type check passed).
+[32m2026-05-22 11:35:48 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 1caafa15-0852-4aaf-a008-a2f8d5b29189 - cleaned_wm_data - Writing file at: /home/joshi/Projects/CornerPredictionEngine/.tmp_dagster_home_at7j9iwc/storage/cleaned_wm_data using PickledObjectFilesystemIOManager...
+[32m2026-05-22 11:35:48 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 1caafa15-0852-4aaf-a008-a2f8d5b29189 - 154162 - cleaned_wm_data - ASSET_MATERIALIZATION - Materialized value cleaned_wm_data.
+[32m2026-05-22 11:35:48 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 1caafa15-0852-4aaf-a008-a2f8d5b29189 - 154162 - cleaned_wm_data - HANDLED_OUTPUT - Handled output "result" using IO manager "io_manager"
+[32m2026-05-22 11:35:48 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 1caafa15-0852-4aaf-a008-a2f8d5b29189 - 154162 - cleaned_wm_data - STEP_SUCCESS - Finished execution of step "cleaned_wm_data" in 855ms.

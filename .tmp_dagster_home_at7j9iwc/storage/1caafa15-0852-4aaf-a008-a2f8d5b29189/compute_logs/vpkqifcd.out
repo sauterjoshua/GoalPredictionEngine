@@ -1,0 +1,4 @@
+🌐 Hole WM-Daten von https://api.football-data.org/v4/competitions/WC/matches
+   ✅ 104 Spiele erhalten
+   📊 DataFrame: 104 Zeilen, 7 Spalten
+💾 Gespeichert: data/raw/wm2026_live.csv (104 Spiele)
