@@ -7,7 +7,7 @@ WORKDIR /app
 # 3. System-Abhängigkeiten installieren (wichtig für C-Extensions wie bei manchen XGBoost/Numpy Versionen)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    && rm -rf /lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # 4. requirements.txt kopieren und Pakete installieren
 COPY requirements.txt .

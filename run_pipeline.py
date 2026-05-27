@@ -10,6 +10,9 @@ import subprocess
 import sys
 import time
 
+from predict import run_batch_prediction
+from notify import run_notification
+
 
 def run_script(script_name: str):
     """Führt ein Python-Skript als Subprozess aus und fängt Fehler ab."""
@@ -39,6 +42,16 @@ def main():
     run_script("prepare_data.py")
     run_script("train.py")
     run_script("visualize.py")
+    
+    # --- Inferenz + Benachrichtigung (Import statt Subprozess, da predict.py
+    #     als CLI nur Einzelvorhersagen macht; wir brauchen die Batch-Funktion) ---
+    print("\n🚀 [PIPELINE] Starte: Batch-Vorhersage...")
+    run_batch_prediction()  # nutzt heute() als Referenzdatum, schreibt predictions.csv + History
+    print("✅ [PIPELINE] Batch-Vorhersage beendet!")
+
+    print("\n🚀 [PIPELINE] Starte: Telegram-Benachrichtigung...")
+    run_notification()  # sendet Push; Leer-Fall = nichts senden
+    print("✅ [PIPELINE] Benachrichtigung beendet!")
     
     total_duration = time.time() - global_start
     print("\n" + "=" * 60)

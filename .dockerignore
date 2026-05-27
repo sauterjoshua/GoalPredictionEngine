@@ -1,0 +1,28 @@
+# === SECRETS (kritisch — niemals ins Image!) ===
+.env
+*.env
+
+# === Python-Ballast ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# === Virtuelle Umgebung (lokal, gehört nicht in den Container) ===
+venv/
+.venv/
+
+# === Git & Editor ===
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# === Generierte Outputs (werden im Container neu erzeugt) ===
+data/processed/
+plots/
+models/
+
+# === Doku / sonstiges, das nicht laufen muss ===
+README.md
+*.md
