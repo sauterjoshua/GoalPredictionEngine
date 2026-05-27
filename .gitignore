@@ -219,13 +219,22 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Daten-Ordner komplett ignorieren (Rohdaten & verarbeitete Daten)
+# Daten-Ordner: generierte Zwischendateien ignorieren
 data/raw/*
 data/processed/*
 
-# Aber die .gitkeep Dateien behalten, damit die Ordnerstruktur auf GitHub bleibt
+# Ausnahmen: Ordner-Marker behalten
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+
+# Ausnahmen: statische Rohdaten (einmalig manuell git add -f; danach per CI gepflegt)
+!data/raw/matches_1930_2022.csv
+!data/raw/wm_dataset.csv
+
+# Ausnahmen: Live-Daten + Pipeline-Outputs (täglich per CI zurück-committet)
+!data/raw/wm2026_live.csv
+!data/processed/predictions.csv
+!data/processed/prediction_history.csv
 
 # Trainierte KI-Modelle ignorieren
 models/*.pkl

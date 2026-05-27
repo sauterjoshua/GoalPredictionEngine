@@ -1,0 +1,124 @@
+name: WM 2026 — Tägliche Pipeline
+
+# ─── Trigger ────────────────────────────────────────────────────────────────
+on:
+  schedule:
+    - cron: '0 5 * * *'   # täglich 05:00 UTC (= 07:00 CEST / 06:00 CET)
+  workflow_dispatch:        # manueller "Run workflow"-Button in der GitHub UI
+
+# ─── Berechtigungen ─────────────────────────────────────────────────────────
+permissions:
+  contents: write    # git commit-back
+  packages: write    # ghcr.io push
+
+# ─── Umgebungsvariablen ──────────────────────────────────────────────────────
+env:
+  REGISTRY:   ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/goalpredictionengine
+
+jobs:
+  pipeline:
+    name: Build → Run → Commit-back
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ── 1. Repo holen ──────────────────────────────────────────────────────
+      # fetch-depth: 0 damit git push später den Branch-History kennt
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # ── 2. Docker Buildx (BuildKit) ────────────────────────────────────────
+      - name: 🛠️ Docker Buildx einrichten
+        uses: docker/setup-buildx-action@v3
+
+      # ── 3. ghcr.io Login ──────────────────────────────────────────────────
+      - name: 🔐 Login → ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 4. Image bauen & pushen ────────────────────────────────────────────
+      # Layer-Cache via GHA-Cache → pip-Layer bleibt über Runs hinweg gecacht,
+      # nur Code-/Daten-Änderungen erzwingen einen Rebuild.
+      #
+      # VORAUSSETZUNG: data/raw/matches_1930_2022.csv und data/raw/wm_dataset.csv
+      # müssen einmalig lokal per `git add -f` eincommittet worden sein, damit
+      # sie beim COPY . . in das Image gelangen.
+      - name: 🏗️ Image bauen & pushen
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:run-${{ github.run_id }}
+          cache-from: type=gha
+          cache-to:   type=gha,mode=max
+
+      # ── 5. Datenverzeichnisse & Seed-Dateien sicherstellen ─────────────────
+      # wm2026_live.csv: leere Datei anlegen, falls Erstlauf (bind-mount braucht
+      # eine existierende Host-Datei, sonst erstellt Docker ein Verzeichnis).
+      # predictions.csv / prediction_history.csv: leere CSVs mit Headern,
+      # damit pd.read_csv nicht auf EmptyDataError läuft.
+      - name: 📁 Datenverzeichnisse vorbereiten
+        run: |
+          mkdir -p data/raw data/processed
+
+          # wm2026_live.csv – leer OK, Pipeline überschreibt sie als erstes
+          touch data/raw/wm2026_live.csv
+
+          # predictions.csv – Header, falls noch nicht existent oder leer
+          if [ ! -s data/processed/predictions.csv ]; then
+            echo "date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,home_form_attack,away_form_attack,home_market_value,away_market_value" \
+              > data/processed/predictions.csv
+          fi
+
+          # prediction_history.csv – Header, falls noch nicht existent oder leer
+          if [ ! -s data/processed/prediction_history.csv ]; then
+            echo "date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,home_form_attack,away_form_attack,home_market_value,away_market_value,match_key,predicted_at" \
+              > data/processed/prediction_history.csv
+          fi
+
+      # ── 6. Pipeline im Container ausführen ────────────────────────────────
+      # Zwei selektive Mounts, damit:
+      #   a) data/raw/wm2026_live.csv vom Container frisch beschrieben wird
+      #      und danach im Workspace liegt (→ git add)
+      #   b) data/processed/ (predictions + history) im Workspace akkumuliert
+      #      werden, statt im Container verloren zu gehen
+      # data/raw/matches_1930_2022.csv und wm_dataset.csv bleiben im Image
+      # (COPY . .) → kein Mount nötig, kein Überschreiben durch leere Workspace-Datei.
+      - name: 🚀 Pipeline starten
+        run: |
+          docker run --rm \
+            -e FOOTBALL_DATA_TOKEN="${{ secrets.FOOTBALL_DATA_TOKEN }}" \
+            -e TELEGRAM_BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}" \
+            -e TELEGRAM_CHAT_ID="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -v "${{ github.workspace }}/data/raw/wm2026_live.csv:/app/data/raw/wm2026_live.csv" \
+            -v "${{ github.workspace }}/data/processed:/app/data/processed" \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      # ── 7. Aktualisierte CSVs committen und pushen ────────────────────────
+      # Gezieltes `git add` – niemals globales `git add .` (Secrets-Leak-Gefahr)!
+      # `git diff --staged --quiet` liefert exit 0 wenn nichts staged → kein Commit.
+      - name: 💾 Daten committen & pushen
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add \
+            data/raw/wm2026_live.csv \
+            data/processed/predictions.csv \
+            data/processed/prediction_history.csv
+
+          if git diff --staged --quiet; then
+            echo "ℹ️  Keine Daten-Änderungen – kein Commit nötig."
+          else
+            git commit -m "🤖 Pipeline-Update $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi

@@ -1,20 +1,21 @@
-# 1. Nutzen eines offiziellen, schlanken Python-Images als Basis
-FROM python:3.14-slim
+# 1. Stabiles, schlankes Python-Image (3.12 LTS – alle Wheels verfügbar)
+FROM python:3.12-slim
 
-# 2. Setzen des Arbeitsverzeichnisses im Container
+# 2. Arbeitsverzeichnis
 WORKDIR /app
 
-# 3. System-Abhängigkeiten installieren (wichtig für C-Extensions wie bei manchen XGBoost/Numpy Versionen)
+# 3. System-Abhängigkeiten für C-Extensions (XGBoost, NumPy)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# 4. requirements.txt kopieren und Pakete installieren
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# 4. Nur Pipeline-relevante Pakete installieren (kein Selenium, kein GPU-Kram)
+COPY requirements-pipeline.txt .
+RUN pip install --no-cache-dir -r requirements-pipeline.txt
 
-# 5. Den gesamten restlichen Projektcode in den Container kopieren
+# 5. Projektcode kopieren (.dockerignore filtert Secrets, virtuelle Envs,
+#    generierte Outputs — data/raw/ mit historischen CSVs bleibt drin)
 COPY . .
 
-# 6. Standard-Befehl beim Starten des Containers: Die Pipeline ausführen
+# 6. Pipeline starten
 CMD ["python", "run_pipeline.py"]
