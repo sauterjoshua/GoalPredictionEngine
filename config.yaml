@@ -2,7 +2,8 @@ selected_tournament: "world_cup"
 
 tournaments:
   world_cup:
-    raw_path: "data/raw/matches_1930_2022.csv"
+    raw_path: "data/raw/wcmatches.csv"
+    team_features_path: "data/raw/w2_26_train_set.csv" 
     processed_path: "data/processed/cleaned_wm_data.csv"
     live_path: "data/raw/wm2026_live.csv"
     predictions_path: "data/processed/predictions.csv"

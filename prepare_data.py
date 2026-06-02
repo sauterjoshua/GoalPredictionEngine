@@ -33,6 +33,10 @@ def merge_live_data(df_historical: pd.DataFrame, live_path: str) -> pd.DataFrame
         print(f"⚠️  Live-Datei nicht gefunden ('{live_path}'). Überspringe Merge.")
         return df_historical
 
+    if os.path.getsize(live_path) == 0:
+        print(f"⚠️  Live-Datei ist leer ('{live_path}'). Überspringe Merge.")
+        return df_historical
+
     df_live = pd.read_csv(live_path)
 
     df_live = df_live[df_live["status"] == "FINISHED"]
@@ -229,7 +233,7 @@ def process_data():
     raw_path = config["tournaments"]["world_cup"]["raw_path"]
     processed_path = config["tournaments"]["world_cup"]["processed_path"]
     live_path = config["tournaments"]["world_cup"]["live_path"]
-    market_value_path = "data/raw/wm_dataset.csv"
+    market_value_path = config["tournaments"]["world_cup"]["team_features_path"]
 
     print(f"⏳ Lade Match-Daten aus '{raw_path}'...")
     df_matches = pd.read_csv(raw_path)
@@ -295,6 +299,7 @@ def process_data():
     ]
 
     cleaned_df = df_wc[final_features]
+    os.makedirs(os.path.dirname(processed_path), exist_ok=True)
     cleaned_df.to_csv(processed_path, index=False)
     print(
         f"\n✅ Pipeline erfolgreich durchgelaufen! Datei gespeichert unter: '{processed_path}'"

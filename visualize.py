@@ -270,10 +270,13 @@ def plot_prediction_evolution(top_n: int = 6):
 
 
 def main():
+    # Zielordner anlegen – im Docker-Container existiert plots/ nicht vorab
+    os.makedirs("plots", exist_ok=True)
+
     df, model_home, model_away = load_data_and_models()
-    
+
     features = [
-        "home_form_attack", "home_form_defense", "away_form_attack", "away_form_defense", 
+        "home_form_attack", "home_form_defense", "away_form_attack", "away_form_defense",
         "home_market_value", "away_market_value", "home_is_host", "away_is_host", "neutral"
     ]
     
