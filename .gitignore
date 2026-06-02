@@ -228,8 +228,9 @@ data/processed/*
 !data/processed/.gitkeep
 
 # Ausnahmen: statische Rohdaten (einmalig manuell git add -f; danach per CI gepflegt)
-!data/raw/matches_1930_2022.csv
-!data/raw/wm_dataset.csv
+!data/raw/wcmatches.csv
+!data/raw/w2_26_train_set.csv
+!data/raw/fifa_player_performance_market_value.csv
 
 # Ausnahmen: Live-Daten + Pipeline-Outputs (täglich per CI zurück-committet)
 !data/raw/wm2026_live.csv
