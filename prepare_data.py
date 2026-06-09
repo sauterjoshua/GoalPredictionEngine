@@ -255,6 +255,7 @@ def process_data():
 
     # Nur FIFA World Cup ab 2000 — schützt vor Concept Drift durch ältere Spielstile
     if "tournament" in df_matches.columns:
+        df_matches["tournament"] = df_matches["tournament"].fillna("FIFA World Cup")
         df_wc = df_matches[df_matches["tournament"] == "FIFA World Cup"].copy()
     else:
         df_wc = df_matches.copy()

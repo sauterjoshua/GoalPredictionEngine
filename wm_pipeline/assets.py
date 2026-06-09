@@ -20,7 +20,7 @@ from dagster import (
 @asset
 def wm2026_live_data(context: AssetExecutionContext) -> MaterializeResult:
     """Live-Daten der WM 2026 von football-data.org (bei jedem Lauf neu geholt)."""
-    from .data_sources import fetch_world_cup_2026_matches, save_matches_to_csv
+    from data_sources import fetch_world_cup_2026_matches, save_matches_to_csv
 
     df = fetch_world_cup_2026_matches()
     output_path = save_matches_to_csv(df)
@@ -84,7 +84,7 @@ def new_finished_matches_sensor(context: SensorEvaluationContext):
     last_count = int(context.cursor) if context.cursor else 0
 
     try:
-        from .data_sources import fetch_world_cup_2026_matches
+        from data_sources import fetch_world_cup_2026_matches
         df = fetch_world_cup_2026_matches()
         current_count = int((df["status"] == "FINISHED").sum())
     except Exception as exc:

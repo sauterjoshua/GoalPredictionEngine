@@ -13,6 +13,11 @@ import time
 from predict import run_batch_prediction
 from notify import run_notification
 
+try:
+    from data_sources import fetch_world_cup_2026_matches, save_matches_to_csv
+except ImportError:
+    from wm_pipeline.data_sources import fetch_world_cup_2026_matches, save_matches_to_csv
+
 
 def fetch_live_data() -> None:
     """Schritt 0: Aktuelle WM-Daten von football-data.org holen.
