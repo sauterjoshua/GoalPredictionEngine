@@ -13,10 +13,29 @@ import yaml
 from sklearn.metrics import mean_absolute_error
 
 
+# Zentrale Hyperparameter für beide Modelle (Heim & Auswärts identisch).
+
+    n_estimators=220,
+    learning_rate=0.02,
+    max_depth=5,
+    subsample=0.7,
+    colsample_bytree=0.7,
+    reg_alpha=0.5,
+    reg_lambda=0.5,
+    random_state=42,
+)
+
+
 def load_config() -> dict:
     """Lädt die zentrale Konfigurationsdatei (config.yaml)."""
     with open("config.yaml", "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
+def outcome_1x2_vec(home, away):
+    """1 = Heimsieg, 2 = Auswärtssieg, 0 = Remis (für ganze Arrays)."""
+    home, away = np.asarray(home), np.asarray(away)
+    return np.where(home > away, 1, np.where(home < away, 2, 0))
 
 
 def main():
@@ -80,31 +99,12 @@ def main():
     print(f"⚖️ Time-Decay aktiv (λ={decay_rate}). "
           f"Gewichtsbereich: {weights.min():.3f} bis {weights.max():.3f}")
 
-    # Stark reguliert (max_depth=3, reg_alpha/lambda) gegen Overfitting auf kleinem Datensatz
-    print("🤖 Trainiere stark reguliertes Modell für HEIM-Tore...")
-    model_home = xgb.XGBRegressor(
-        n_estimators=120,
-        learning_rate=0.02,
-        max_depth=3,
-        subsample=0.7,
-        colsample_bytree=0.7,
-        reg_alpha=1.5,
-        reg_lambda=1.5,
-        random_state=42,
-    )
+    print("🤖 Trainiere Modell für HEIM-Tore...")
+    model_home = xgb.XGBRegressor(**MODEL_PARAMS)
     model_home.fit(X_train, y_home_train, sample_weight=weights)
 
-    print("🤖 Trainiere stark reguliertes Modell für AUSWÄRTS-Tore...")
-    model_away = xgb.XGBRegressor(
-        n_estimators=120,
-        learning_rate=0.02,
-        max_depth=3,
-        subsample=0.7,
-        colsample_bytree=0.7,
-        reg_alpha=1.5,
-        reg_lambda=1.5,
-        random_state=42,
-    )
+    print("🤖 Trainiere Modell für AUSWÄRTS-Tore...")
+    model_away = xgb.XGBRegressor(**MODEL_PARAMS)
     model_away.fit(X_train, y_away_train, sample_weight=weights)
 
     pred_home = model_home.predict(X_test)
@@ -122,10 +122,30 @@ def main():
     )
     print(f"   💡 Zum Vergleich der Turnier-Dummy-Tipp: {baseline_home_mae:.2f}")
 
+    # --- 🎯 Ergebnis-Metriken: messen, was "wer gewinnt" wirklich trifft ---
+    # 1X2 aus den KONTINUIERLICHEN Werten ableiten, nicht aus gerundeten Tipps —
+    # sonst verschwindet ein knapper Favoriten-Vorsprung (1.41 vs 1.05) im Runden.
+    pred_outcome = outcome_1x2_vec(pred_home, pred_away)
+    true_outcome = outcome_1x2_vec(y_home_test, y_away_test)
+    acc_1x2 = (pred_outcome == true_outcome).mean()
+
+    # Exact-Score: beide Tore (gerundet, ≥0) müssen exakt stimmen
+    ph = np.clip(np.round(pred_home), 0, None).astype(int)
+    pa = np.clip(np.round(pred_away), 0, None).astype(int)
+    acc_exact = ((ph == y_home_test.to_numpy()) & (pa == y_away_test.to_numpy())).mean()
+
+    # Baseline "immer Remis" → trifft genau den Anteil echter Unentschieden
+    draw_baseline = (true_outcome == 0).mean()
+
+    print("\n--- 🎯 ERGEBNIS-METRIKEN (WM 2018/2022) ---")
+    print(f"   1X2-Trefferquote (wer gewinnt):  {acc_1x2:.1%}")
+    print(f"   Exact-Score-Trefferquote:        {acc_exact:.1%}")
+    print(f"   💡 Baseline 'immer Remis':       {draw_baseline:.1%}")
+
     os.makedirs("models", exist_ok=True)
     joblib.dump(model_home, "models/wm_home_goals_model.pkl")
     joblib.dump(model_away, "models/wm_away_goals_model.pkl")
-    print("\n💾 Beide High-End-Modelle erfolgreich im Ordner 'models/' gespeichert!")
+    print("\n💾 Beide Modelle erfolgreich im Ordner 'models/' gespeichert!")
 
 
 if __name__ == "__main__":
