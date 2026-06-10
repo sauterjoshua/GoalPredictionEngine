@@ -17,6 +17,13 @@ MARKET_VALUE_NAME_MAP = {
     "Cura?o": "Curaçao",  
 }
 
+HISTORY_NAME_MAP = {
+    "Bosnia and Herzegovina": "Bosnia-Herzegovina",
+    "Cape Verde": "Cape Verde Islands",
+    "DR Congo": "Congo DR",      
+    "Czech Republic": "Czechia",
+}
+
 def load_config() -> dict:
     """Lädt die zentrale Konfigurationsdatei (config.yaml)."""
     with open("config.yaml", "r", encoding="utf-8") as f:
@@ -222,6 +229,8 @@ def aggregate_market_values(df_market: pd.DataFrame) -> pd.DataFrame:
     squad_values = squad_values[["team", "squad_market_value"]].rename(
         columns={"team": "team_name"}
     )
+    
+    squad_values = squad_values.groupby("team_name", as_index=False)["squad_market_value"].max()
 
     print(f"   ✅ {len(squad_values)} Nationen mit Marktwert geladen.")
     return squad_values
@@ -234,6 +243,7 @@ def process_data():
     processed_path = config["tournaments"]["world_cup"]["processed_path"]
     live_path = config["tournaments"]["world_cup"]["live_path"]
     market_value_path = config["tournaments"]["world_cup"]["team_features_path"]
+    match_history_path = config["tournaments"]["world_cup"]["match_history_path"]
 
     print(f"⏳ Lade Match-Daten aus '{raw_path}'...")
     df_matches = pd.read_csv(raw_path)
@@ -243,41 +253,54 @@ def process_data():
     try:
         df_market = pd.read_csv(market_value_path)
     except FileNotFoundError:
-        print(
-            f"❌ Fehler: Die erforderliche Datei '{market_value_path}' fehlt."
-        )
+        print(f"❌ Fehler: Die erforderliche Datei '{market_value_path}' fehlt.")
         sys.exit(1)
 
     df_matches = harmony_columns(df_matches)
     df_matches = convert_dates(df_matches)
+
+    # Quell-Schreibweisen (Historie/Marktwert) auf kanonische Live-Namen normalisieren.
+    # MUSS vor den Formkurven & dem Marktwert-Join laufen (sonst Mismatch).
+    df_matches["home_team"] = df_matches["home_team"].replace(HISTORY_NAME_MAP)
+    df_matches["away_team"] = df_matches["away_team"].replace(HISTORY_NAME_MAP)
+
     df_matches = calculate_form_curves(df_matches)
     df_matches = inject_host_advantage(df_matches)
 
-    # Nur FIFA World Cup ab 2000 — schützt vor Concept Drift durch ältere Spielstile
+    # --- Marktwerte auf den VOLLEN Frame mergen (vor dem WM-Filter), ---
+    # --- damit auch die Serving-Historie Marktwerte trägt. ---
+    squad_values = aggregate_market_values(df_market)
+    print("🔀 Führe Match-Daten und aggregierte Kaderwerte zusammen...")
+    df_matches = df_matches.merge(
+        squad_values, left_on="home_team", right_on="team_name", how="left"
+    ).drop(columns=["team_name"]).rename(columns={"squad_market_value": "home_market_value"})
+    df_matches = df_matches.merge(
+        squad_values, left_on="away_team", right_on="team_name", how="left"
+    ).drop(columns=["team_name"]).rename(columns={"squad_market_value": "away_market_value"})
+
+    # Median-Fallback für kleinere Nationen ohne Marktwert-Eintrag
+    median_value = squad_values["squad_market_value"].median()
+    df_matches["home_market_value"] = df_matches["home_market_value"].fillna(median_value)
+    df_matches["away_market_value"] = df_matches["away_market_value"].fillna(median_value)
+
+    # --- Serving-Feature-Quelle: ungefilterte Match-Historie (alle Spielarten) ---
+    # Wird von predict.get_latest_team_stats() für die FRISCHE Form gelesen.
+    history_cols = [
+        "date", "home_team", "away_team",
+        "home_score", "away_score",
+        "home_market_value", "away_market_value",
+    ]
+    os.makedirs(os.path.dirname(match_history_path), exist_ok=True)
+    df_matches[history_cols].to_csv(match_history_path, index=False)
+    print(f"💾 Serving-Historie: '{match_history_path}' ({len(df_matches)} Spiele)")
+
+    # --- Trainings-Tabelle: nur FIFA World Cup ab 2000 (Concept-Drift-Schutz) ---
     if "tournament" in df_matches.columns:
         df_matches["tournament"] = df_matches["tournament"].fillna("FIFA World Cup")
         df_wc = df_matches[df_matches["tournament"] == "FIFA World Cup"].copy()
     else:
         df_wc = df_matches.copy()
     df_wc = df_wc[df_wc["date"].dt.year >= 2000].reset_index(drop=True)
-
-    squad_values = aggregate_market_values(df_market)
-
-    print("🔀 Führe Match-Daten und aggregierte Kaderwerte zusammen...")
-    df_wc = df_wc.merge(
-        squad_values, left_on="home_team", right_on="team_name", how="left"
-    ).drop(columns=["team_name"])
-    df_wc = df_wc.rename(columns={"squad_market_value": "home_market_value"})
-
-    df_wc = df_wc.merge(
-        squad_values, left_on="away_team", right_on="team_name", how="left"
-    ).drop(columns=["team_name"])
-    df_wc = df_wc.rename(columns={"squad_market_value": "away_market_value"})
-
-    # Median-Fallback für kleinere Nationen ohne Marktwert-Eintrag
-    median_value = squad_values["squad_market_value"].median()
-    df_wc["home_market_value"] = df_wc["home_market_value"].fillna(median_value)
-    df_wc["away_market_value"] = df_wc["away_market_value"].fillna(median_value)
 
     df_wc["neutral"] = 1  # WM-Spiele finden immer auf neutralem Boden statt
 

@@ -100,10 +100,11 @@ def predict_match(home_team: str, away_team: str, model_home, model_away,
 
 
 def load_models_and_data():
-    """Lädt die serialisierten XGBoost-Modelle und den aufbereiteten Datensatz."""
+    """Lädt die serialisierten XGBoost-Modelle und die Match-Historie (Form-Quelle)."""
+    config = load_config()
     model_home = joblib.load("models/wm_home_goals_model.pkl")
     model_away = joblib.load("models/wm_away_goals_model.pkl")
-    df = pd.read_csv("data/processed/cleaned_wm_data.csv")
+    df = pd.read_csv(config["tournaments"]["world_cup"]["match_history_path"])
     return model_home, model_away, df
 
 

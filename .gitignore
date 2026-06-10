@@ -243,3 +243,5 @@ models/*.pkl
 downloaded_files/
 
 requirements_old.txt
+
+test_api.py
