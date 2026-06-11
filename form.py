@@ -32,8 +32,8 @@ WINDOW_SIZE = 5
 FALLBACK_FORM = 1.3
 
 # Cap-Grenzen für den Gegner-Faktor (verhindert Extremwerte bei Außenseitern)
-OPPONENT_FACTOR_MIN = 0.5
-OPPONENT_FACTOR_MAX = 2.0
+OPPONENT_FACTOR_MIN = 0.7
+OPPONENT_FACTOR_MAX = 1.5
 
 
 def tournament_weight(tournament) -> float:
