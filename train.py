@@ -15,6 +15,7 @@ from sklearn.metrics import mean_absolute_error
 
 # Zentrale Hyperparameter für beide Modelle (Heim & Auswärts identisch).
 
+MODEL_PARAMS = dict(
     n_estimators=220,
     learning_rate=0.02,
     max_depth=5,
