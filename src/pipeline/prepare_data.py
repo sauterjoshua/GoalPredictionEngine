@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from form import compute_form
+from src.utils.form import compute_form
 
 MARKET_VALUE_NAME_MAP = {
     "Czech Republic": "Czechia",

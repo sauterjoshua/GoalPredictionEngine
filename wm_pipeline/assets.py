@@ -20,7 +20,7 @@ from dagster import (
 @asset
 def wm2026_live_data(context: AssetExecutionContext) -> MaterializeResult:
     """Live-Daten der WM 2026 von football-data.org (bei jedem Lauf neu geholt)."""
-    from data_sources import fetch_world_cup_2026_matches, save_matches_to_csv
+    from src.utils.data_sources import fetch_world_cup_2026_matches, save_matches_to_csv
 
     df = fetch_world_cup_2026_matches()
     output_path = save_matches_to_csv(df)
@@ -41,12 +41,12 @@ def wm2026_live_data(context: AssetExecutionContext) -> MaterializeResult:
             "output_path": MetadataValue.path(output_path),
         }
     )
-    
-    
+
+
 @asset(deps=[wm2026_live_data])
 def cleaned_wm_data(context: AssetExecutionContext):
     """Bereinigte WM-Daten (Wrapper um prepare_data.py)."""
-    from prepare_data import process_data
+    from src.pipeline.prepare_data import process_data
     process_data()
     context.log.info("✅ WM-Daten erfolgreich aufbereitet.")
 
@@ -54,7 +54,7 @@ def cleaned_wm_data(context: AssetExecutionContext):
 @asset(deps=[cleaned_wm_data])
 def trained_models(context: AssetExecutionContext):
     """Trainierte XGBoost-Modelle (Wrapper um train.py)."""
-    from train import main as train_main
+    from src.pipeline.train import main as train_main
     train_main()
     context.log.info("✅ Modelle erfolgreich trainiert.")
 
@@ -62,10 +62,10 @@ def trained_models(context: AssetExecutionContext):
 @asset(deps=[trained_models])
 def diagnostic_plots(context: AssetExecutionContext):
     """Diagnose-Plots im Ordner 'plots/' (Wrapper um visualize.py)."""
-    from visualize import main as visualize_main
+    from src.pipeline.visualize import main as visualize_main
     visualize_main()
     context.log.info("✅ Diagnose-Plots generiert.")
-    
+
 
 wm_pipeline_job = define_asset_job(
     name="wm_pipeline_job",
@@ -84,7 +84,7 @@ def new_finished_matches_sensor(context: SensorEvaluationContext):
     last_count = int(context.cursor) if context.cursor else 0
 
     try:
-        from data_sources import fetch_world_cup_2026_matches
+        from src.utils.data_sources import fetch_world_cup_2026_matches
         df = fetch_world_cup_2026_matches()
         current_count = int((df["status"] == "FINISHED").sum())
     except Exception as exc:
@@ -104,18 +104,18 @@ def new_finished_matches_sensor(context: SensorEvaluationContext):
         f"Keine neuen FINISHED-Spiele ({current_count}). "
         f"Nächster Check in ~5 Minuten."
     )
-    
+
 @asset(deps=["trained_models"])
 def match_predictions(context):
-    from predict import run_batch_prediction
+    from src.pipeline.predict import run_batch_prediction
     df = run_batch_prediction()  # nutzt heute() als Referenzdatum
     return MaterializeResult(
         metadata={"predicted_matches": len(df)}
     )
-    
+
 @asset(deps=["match_predictions"])
 def telegram_notification(context):
-    from notify import run_notification
+    from src.delivery.notify import run_notification
     count = run_notification()
     context.log.info(f"{count} Spiel(e) per Telegram benachrichtigt")
     return MaterializeResult(

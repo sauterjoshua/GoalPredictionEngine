@@ -42,30 +42,7 @@ def load_history(path: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-# Ländername → ISO-2-Code; Fallback in flag_emoji() ist eine weiße Flagge
-COUNTRY_TO_ISO = {
-    "Germany": "DE", "France": "FR", "Spain": "ES", "Italy": "IT",
-    "England": "GB", "Brazil": "BR", "Argentina": "AR", "Portugal": "PT",
-    "Netherlands": "NL", "Belgium": "BE", "Croatia": "HR", "USA": "US",
-    "United States": "US", "Canada": "CA", "Mexico": "MX", "Japan": "JP",
-    "South Korea": "KR", "Curaçao": "CW", "Curacao": "CW", "Ecuador": "EC",
-    "Ivory Coast": "CI", "Morocco": "MA", "Senegal": "SN", "Ghana": "GH",
-    "Uruguay": "UY", "Colombia": "CO", "Switzerland": "CH", "Denmark": "DK",
-    "Poland": "PL", "Austria": "AT", "Australia": "AU", "Qatar": "QA",
-    "Saudi Arabia": "SA", "Nigeria": "NG", "Cameroon": "CM", "Serbia": "RS",
-    "Norway": "NO", "Sweden": "SE", "Turkey": "TR", "Egypt": "EG",
-}
-
-
-def flag_emoji(country: str) -> str:
-    """Wandelt einen Ländernamen in ein Flaggen-Emoji (Fallback: 🏳️).
-
-    Flaggen bestehen aus zwei Regional Indicator Symbols (Basis 0x1F1E6 = 'A').
-    """
-    iso = COUNTRY_TO_ISO.get(country)
-    if not iso:
-        return "🏳️"
-    return "".join(chr(0x1F1E6 + (ord(c) - ord("A"))) for c in iso.upper())
+from src.utils.flags import flag_emoji
 
 
 def render_match_card(row: pd.Series):

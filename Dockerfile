@@ -17,5 +17,8 @@ RUN pip install --no-cache-dir -r requirements-pipeline.txt
 #    generierte Outputs — data/raw/ mit historischen CSVs bleibt drin)
 COPY . .
 
-# 6. Pipeline starten
+# 6. src-Paket im Pythonpfad bekannt machen (absolute Imports funktionieren)
+ENV PYTHONPATH=/app
+
+# 7. Pipeline starten
 CMD ["python", "run_pipeline.py"]
