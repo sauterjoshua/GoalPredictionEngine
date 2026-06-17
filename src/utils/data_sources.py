@@ -19,7 +19,7 @@ def fetch_world_cup_2026_matches() -> pd.DataFrame:
     Während/nach WM: Scores sind gefüllt.
 
     Returns:
-        DataFrame mit Spalten: date, home_team, away_team, home_score, away_score, status
+        DataFrame mit Spalten: date, home_team, away_team, home_score, away_score, tournament, status, stage
     """
     if not FOOTBALL_DATA_TOKEN:
         raise ValueError(
@@ -57,7 +57,8 @@ def fetch_world_cup_2026_matches() -> pd.DataFrame:
             "home_score": home_score,
             "away_score": away_score,
             "tournament": "FIFA World Cup",
-            "status": match.get("status"),  # SCHEDULED, FINISHED, IN_PLAY...
+            "status": match.get("status"),   # SCHEDULED, FINISHED, IN_PLAY…
+            "stage": match.get("stage"),     # GROUP_STAGE, LAST_16, QUARTER_FINALS…
         })
 
     df = pd.DataFrame(rows)

@@ -18,6 +18,43 @@ from dotenv import load_dotenv
 from src.utils.flags import flag_emoji
 
 
+def _safe_str(row: pd.Series, col: str, default: str) -> str:
+    val = row.get(col, default)
+    return default if pd.isna(val) else str(val)
+
+
+def _safe_int(row: pd.Series, col: str, default: int = 0) -> int:
+    val = row.get(col, default)
+    try:
+        return default if pd.isna(val) else int(val)
+    except (TypeError, ValueError):
+        return default
+
+
+def _format_score(row: pd.Series) -> str:
+    """Gibt den formatierten Tipp-String zurück — inkl. KO-Suffix falls vorhanden."""
+    decided_by = _safe_str(row, "decided_by", "90min")
+    tipp_home = int(row["tipp_home"])
+    tipp_away = int(row["tipp_away"])
+
+    if decided_by == "ET":
+        total_home = tipp_home + _safe_int(row, "home_goals_et")
+        total_away = tipp_away + _safe_int(row, "away_goals_et")
+        return f"{total_home}:{total_away} (n.V.)"
+
+    if decided_by == "penalties":
+        winner = _safe_str(row, "predicted_winner", "")
+        if winner == "home":
+            winner_flag = flag_emoji(row["home_team"])
+        elif winner == "away":
+            winner_flag = flag_emoji(row["away_team"])
+        else:
+            winner_flag = "🏆"
+        return f"{tipp_home}:{tipp_away} (i.E.) → {winner_flag}"
+
+    return f"{tipp_home}:{tipp_away}"
+
+
 def load_predictions_path() -> str:
     """Liest den Pfad zur predictions.csv aus der config.yaml."""
     with open("config.yaml", "r", encoding="utf-8") as f:
@@ -32,7 +69,7 @@ def build_message(df: pd.DataFrame) -> str:
     for _, row in df.iterrows():
         home, away = row["home_team"], row["away_team"]
         hf, af = flag_emoji(home), flag_emoji(away)
-        tipp = f"{int(row['tipp_home'])}:{int(row['tipp_away'])}"
+        tipp = _format_score(row)
         exact = f"{row['pred_home_goals']:.2f}–{row['pred_away_goals']:.2f}"
         lines.append(
             f"{hf} {home} vs {away} {af}\n"

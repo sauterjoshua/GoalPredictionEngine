@@ -78,38 +78,94 @@ def get_latest_team_stats(team: str, df: pd.DataFrame) -> tuple[float, float, fl
     return form_attack, form_defense, market_value
 
 
-def predict_match(home_team: str, away_team: str, model_home, model_away,
-                  df: pd.DataFrame) -> dict:
-    """Tor-Vorhersage für ein einzelnes Spiel."""
-    home_attack, home_defense, home_val = get_latest_team_stats(home_team, df)
-    away_attack, away_defense, away_val = get_latest_team_stats(away_team, df)
+def _wc_titles(team: str, df_features: pd.DataFrame) -> float:
+    """Gibt world_cup_titles_before für ein Team aus dem Team-Features-DataFrame zurück."""
+    rows = df_features[df_features["team"] == team]
+    if rows.empty:
+        return 0.0
+    return float(rows.sort_values("version").iloc[-1]["world_cup_titles_before"])
 
-    input_data = pd.DataFrame([{
-        "home_form_attack": home_attack,
-        "home_form_defense": home_defense,
-        "away_form_attack": away_attack,
-        "away_form_defense": away_defense,
-        "home_market_value": home_val,
-        "away_market_value": away_val,
-        "home_is_host": 1 if home_team in HOSTS_2026 else 0,
-        "away_is_host": 1 if away_team in HOSTS_2026 else 0,
-        "neutral": 1
-    }])
 
-    pred_home_goals = max(0.0, float(model_home.predict(input_data)[0]))
-    pred_away_goals = max(0.0, float(model_away.predict(input_data)[0]))
+def _norm_pair(a: float, b: float) -> tuple[float, float]:
+    """Relative Normalisierung: a / (a + b). Bei Summe 0 → 0.5 / 0.5."""
+    total = a + b
+    if total == 0:
+        return 0.5, 0.5
+    return a / total, b / total
+
+
+def predict_match(home_stats: dict, away_stats: dict,
+                  is_knockout: bool = False) -> dict:
+    """Wendet KO-Logik auf vorberechnete Team-Stats an.
+
+    home_stats / away_stats erwartete Schlüssel:
+      form_attack              – xG-Basis (Modell-Output oder direkte Form-Metrik)
+      squad_total_market_value_eur – Marktwert (beliebige Einheit, nur relativ genutzt)
+      world_cup_titles_before  – WM-Titel vor dem Turnier
+    """
+    pred_home_goals = max(0.0, float(home_stats["form_attack"]))
+    pred_away_goals = max(0.0, float(away_stats["form_attack"]))
+    home_val = float(home_stats.get("squad_total_market_value_eur", 0))
+    away_val = float(away_stats.get("squad_total_market_value_eur", 0))
+    home_wct = float(home_stats.get("world_cup_titles_before", 0))
+    away_wct = float(away_stats.get("world_cup_titles_before", 0))
+
+    home_goals_90 = round(pred_home_goals)
+    away_goals_90 = round(pred_away_goals)
+
+    home_goals_et = 0
+    away_goals_et = 0
+    decided_by = "90min"
+
+    if is_knockout and home_goals_90 == away_goals_90:
+        fatigue_factor = 0.75
+        home_goals_et = round(pred_home_goals * (30 / 90) * fatigue_factor)
+        away_goals_et = round(pred_away_goals * (30 / 90) * fatigue_factor)
+        decided_by = "ET"
+
+    home_total = home_goals_90 + home_goals_et
+    away_total = away_goals_90 + away_goals_et
+
+    if is_knockout and decided_by == "ET" and home_total == away_total:
+        decided_by = "penalties"
+
+    if decided_by == "penalties":
+        norm_home_mv, _ = _norm_pair(home_val, away_val)
+        norm_home_wct, _ = _norm_pair(home_wct, away_wct)
+        home_penalty_score = 0.6 * norm_home_mv + 0.4 * norm_home_wct
+        predicted_winner = "home" if home_penalty_score > 0.5 else "away"
+    elif is_knockout:
+        predicted_winner = "home" if home_total > away_total else "away"
+    else:
+        if home_goals_90 > away_goals_90:
+            predicted_winner = "home"
+        elif home_goals_90 < away_goals_90:
+            predicted_winner = "away"
+        else:
+            predicted_winner = "draw"
 
     return {
-        "home_team": home_team,
-        "away_team": away_team,
         "pred_home_goals": round(pred_home_goals, 2),
         "pred_away_goals": round(pred_away_goals, 2),
-        "tipp_home": round(pred_home_goals),
-        "tipp_away": round(pred_away_goals),
-        "home_form_attack": round(home_attack, 2),
-        "away_form_attack": round(away_attack, 2),
-        "home_market_value": round(home_val, 1),
-        "away_market_value": round(away_val, 1),
+        "tipp_home": home_goals_90,
+        "tipp_away": away_goals_90,
+        "home_goals_et": home_goals_et,
+        "away_goals_et": away_goals_et,
+        "decided_by": decided_by,
+        "predicted_winner": predicted_winner,
+    }
+
+
+def _build_stats_dict(team: str, df: pd.DataFrame,
+                      df_team_features: pd.DataFrame | None,
+                      model_pred_goals: float) -> dict:
+    """Baut den Stats-Dict für predict_match aus Modell-Output und Team-Daten."""
+    _, _, market_val = get_latest_team_stats(team, df)
+    wct = _wc_titles(team, df_team_features) if df_team_features is not None else 0.0
+    return {
+        "form_attack": model_pred_goals,
+        "squad_total_market_value_eur": market_val,
+        "world_cup_titles_before": wct,
     }
 
 
@@ -166,11 +222,14 @@ def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
     config = load_config()
     live_path = config["tournaments"]["world_cup"]["live_path"]
     predictions_path = config["tournaments"]["world_cup"]["predictions_path"]
+    team_features_path = config["tournaments"]["world_cup"]["team_features_path"]
     window_days = config.get("prediction", {}).get("prediction_window_days", 3)
 
     output_columns = [
-        "date", "home_team", "away_team",
+        "date", "home_team", "away_team", "stage",
         "pred_home_goals", "pred_away_goals", "tipp_home", "tipp_away",
+        "home_goals_et", "away_goals_et",
+        "decided_by", "predicted_winner",
         "home_form_attack", "away_form_attack",
         "home_market_value", "away_market_value",
     ]
@@ -184,6 +243,9 @@ def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
 
     df_live = pd.read_csv(live_path)
     df_upcoming = df_live[df_live["status"] == "TIMED"].copy()
+
+    if "stage" not in df_upcoming.columns:
+        df_upcoming["stage"] = "GROUP_STAGE"
 
     df_upcoming["date"] = pd.to_datetime(
         df_upcoming["date"], errors="coerce", utc=True
@@ -200,14 +262,45 @@ def run_batch_prediction(reference_date: str | None = None) -> pd.DataFrame:
         return empty_df
 
     model_home, model_away, df = load_models_and_data()
+    df_team_features = pd.read_csv(team_features_path)
 
     print(f"🔮 Rechne Vorhersagen für {len(df_window)} Spiel(e)...")
     results = []
     for _, match in df_window.iterrows():
-        pred = predict_match(
-            match["home_team"], match["away_team"], model_home, model_away, df
-        )
+        home_team = match["home_team"]
+        away_team = match["away_team"]
+        stage = match.get("stage", "GROUP_STAGE")
+        is_knockout = stage != "GROUP_STAGE"
+
+        home_attack, home_defense, home_val = get_latest_team_stats(home_team, df)
+        away_attack, away_defense, away_val = get_latest_team_stats(away_team, df)
+
+        input_data = pd.DataFrame([{
+            "home_form_attack": home_attack,
+            "home_form_defense": home_defense,
+            "away_form_attack": away_attack,
+            "away_form_defense": away_defense,
+            "home_market_value": home_val,
+            "away_market_value": away_val,
+            "home_is_host": 1 if home_team in HOSTS_2026 else 0,
+            "away_is_host": 1 if away_team in HOSTS_2026 else 0,
+            "neutral": 1,
+        }])
+        model_home_pred = max(0.0, float(model_home.predict(input_data)[0]))
+        model_away_pred = max(0.0, float(model_away.predict(input_data)[0]))
+
+        home_stats = _build_stats_dict(home_team, df, df_team_features, model_home_pred)
+        away_stats = _build_stats_dict(away_team, df, df_team_features, model_away_pred)
+
+        pred = predict_match(home_stats, away_stats, is_knockout=is_knockout)
+        pred["home_team"] = home_team
+        pred["away_team"] = away_team
         pred["date"] = match["date"].date().isoformat()
+        pred["stage"] = stage
+        pred["home_form_attack"] = round(home_attack, 2)
+        pred["away_form_attack"] = round(away_attack, 2)
+        pred["home_market_value"] = round(home_val, 1)
+        pred["away_market_value"] = round(away_val, 1)
         results.append(pred)
 
     predictions_df = pd.DataFrame(results)[output_columns]
@@ -237,14 +330,33 @@ def main():
         print("   Bitte führe zuerst prepare_data.py und train.py aus.")
         sys.exit(1)
 
-    pred = predict_match(home_team, away_team, model_home, model_away, df)
+    config = load_config()
+    df_team_features = pd.read_csv(config["tournaments"]["world_cup"]["team_features_path"])
+
+    home_attack, home_defense, home_val = get_latest_team_stats(home_team, df)
+    away_attack, away_defense, away_val = get_latest_team_stats(away_team, df)
+
+    input_data = pd.DataFrame([{
+        "home_form_attack": home_attack, "home_form_defense": home_defense,
+        "away_form_attack": away_attack, "away_form_defense": away_defense,
+        "home_market_value": home_val, "away_market_value": away_val,
+        "home_is_host": 1 if home_team in HOSTS_2026 else 0,
+        "away_is_host": 1 if away_team in HOSTS_2026 else 0,
+        "neutral": 1,
+    }])
+    model_home_pred = max(0.0, float(model_home.predict(input_data)[0]))
+    model_away_pred = max(0.0, float(model_away.predict(input_data)[0]))
+
+    home_stats = _build_stats_dict(home_team, df, df_team_features, model_home_pred)
+    away_stats = _build_stats_dict(away_team, df, df_team_features, model_away_pred)
+    pred = predict_match(home_stats, away_stats)
 
     print("\n" + "=" * 55)
     print(f"🔮 PREDICTION ENGINE — WM 2026 SIMULATION:")
     print(f"   {home_team} vs. {away_team}")
     print("=" * 55)
-    print(f"💰 Kaderwert {home_team:12}: {pred['home_market_value']:6.1f}M € | Form-Angriff: {pred['home_form_attack']:.2f}")
-    print(f"💰 Kaderwert {away_team:12}: {pred['away_market_value']:6.1f}M € | Form-Angriff: {pred['away_form_attack']:.2f}")
+    print(f"💰 Kaderwert {home_team:12}: {home_val:6.1f}M € | Form-Angriff: {home_attack:.2f}")
+    print(f"💰 Kaderwert {away_team:12}: {away_val:6.1f}M € | Form-Angriff: {away_attack:.2f}")
     print("-" * 55)
     print(f"⚽ Erwartete Tore {home_team}: {pred['pred_home_goals']:.2f}")
     print(f"⚽ Erwartete Tore {away_team}: {pred['pred_away_goals']:.2f}")
