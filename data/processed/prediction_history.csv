@@ -1,101 +1,105 @@
-date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,home_form_attack,away_form_attack,home_market_value,away_market_value,match_key,predicted_at
-2026-06-12,South Korea,Czechia,1.32,1.19,1,1,1.3,1.3,1129.3,1129.3,2026-06-12_South Korea_Czechia,2026-05-22T10:04:32
-2026-06-12,Canada,Bosnia-Herzegovina,1.24,1.27,1,1,0.67,1.3,1129.3,1129.3,2026-06-12_Canada_Bosnia-Herzegovina,2026-05-22T10:04:32
-2026-06-13,United States,Paraguay,1.21,1.37,1,1,1.0,0.6,1129.3,1129.3,2026-06-13_United States_Paraguay,2026-05-22T10:04:32
-2026-06-13,Qatar,Switzerland,1.21,1.27,1,1,0.33,1.4,1129.3,1129.3,2026-06-13_Qatar_Switzerland,2026-05-22T10:04:32
-2026-06-13,Brazil,Morocco,1.31,1.24,1,1,1.6,0.6,1137.8,1129.3,2026-06-13_Brazil_Morocco,2026-05-22T10:04:32
-2026-06-14,Haiti,Scotland,1.32,1.19,1,1,1.3,1.3,1129.3,1129.3,2026-06-14_Haiti_Scotland,2026-05-22T10:04:32
-2026-06-14,Australia,Turkey,1.26,1.18,1,1,1.0,1.3,1129.3,1129.3,2026-06-14_Australia_Turkey,2026-05-22T10:04:32
-2026-06-14,Germany,Curaçao,1.28,1.03,1,1,1.6,1.3,1126.7,1129.3,2026-06-14_Germany_Curaçao,2026-05-22T10:04:32
-2026-06-14,Netherlands,Japan,1.45,1.04,1,1,2.0,1.4,1120.0,1129.3,2026-06-14_Netherlands_Japan,2026-05-22T10:04:32
-2026-06-14,Ivory Coast,Ecuador,1.32,1.22,1,1,1.3,1.4,1129.3,1129.3,2026-06-14_Ivory Coast_Ecuador,2026-05-22T10:04:32
-2026-06-12,South Korea,Czechia,1.31,1.25,1,1,1.3,1.3,285.1,285.1,2026-06-12_South Korea_Czechia,2026-05-22T10:44:24
-2026-06-12,Canada,Bosnia-Herzegovina,1.14,1.46,1,1,0.67,1.3,21.9,285.1,2026-06-12_Canada_Bosnia-Herzegovina,2026-05-22T10:44:24
-2026-06-13,United States,Paraguay,1.25,1.28,1,1,1.0,0.6,169.7,124.0,2026-06-13_United States_Paraguay,2026-05-22T10:44:24
-2026-06-13,Qatar,Switzerland,1.13,1.42,1,1,0.33,1.4,18.0,251.0,2026-06-13_Qatar_Switzerland,2026-05-22T10:44:24
-2026-06-13,Brazil,Morocco,1.27,1.2,1,1,1.6,0.6,932.0,435.6,2026-06-13_Brazil_Morocco,2026-05-22T10:44:24
-2026-06-14,Haiti,Scotland,1.31,1.25,1,1,1.3,1.3,285.1,285.1,2026-06-14_Haiti_Scotland,2026-05-22T10:44:24
-2026-06-14,Australia,Turkey,1.14,1.44,1,1,1.0,1.3,32.8,285.1,2026-06-14_Australia_Turkey,2026-05-22T10:44:24
-2026-06-14,Germany,Curaçao,1.3,1.11,1,1,1.6,1.3,828.0,285.1,2026-06-14_Germany_Curaçao,2026-05-22T10:44:24
-2026-06-14,Netherlands,Japan,1.54,0.98,2,1,2.0,1.4,808.0,223.5,2026-06-14_Netherlands_Japan,2026-05-22T10:44:24
-2026-06-14,Ivory Coast,Ecuador,1.3,1.26,1,1,1.3,1.4,285.1,349.6,2026-06-14_Ivory Coast_Ecuador,2026-05-22T10:44:24
-2026-06-11,Mexico,South Africa,1.19,2.01,1,2,0.0,2.0,217.9,217.9,2026-06-11_Mexico_South Africa,2026-06-09T08:28:59
-2026-06-12,South Korea,Czechia,1.55,1.0,2,1,2.0,1.3,217.9,281.8,2026-06-12_South Korea_Czechia,2026-06-09T08:28:59
-2026-06-11,Mexico,South Africa,1.41,1.05,1,1,1.8,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-10T11:53:18
-2026-06-12,South Korea,Czechia,1.22,1.32,1,1,1.4,3.4,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-10T11:53:18
-2026-06-12,Canada,Bosnia-Herzegovina,1.36,1.1,1,1,1.4,0.8,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-10T11:53:18
-2026-06-13,United States,Paraguay,1.31,1.09,1,1,2.2,1.8,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-10T11:53:18
-2026-06-11,Mexico,South Africa,1.42,1.05,1,1,1.8,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-10T11:56:47
-2026-06-13,United States,Paraguay,1.3,1.09,1,1,2.2,1.8,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-10T11:56:47
-2026-06-11,Mexico,South Africa,1.68,1.05,2,1,1.8,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-10T11:57:48
-2026-06-12,South Korea,Czechia,1.06,1.32,1,1,1.4,3.4,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-10T11:57:48
-2026-06-12,Canada,Bosnia-Herzegovina,1.54,1.1,2,1,1.4,0.8,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-10T11:57:48
-2026-06-13,United States,Paraguay,1.17,1.09,1,1,2.2,1.8,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-10T11:57:48
-2026-06-11,Mexico,South Africa,1.68,0.85,2,1,1.8,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-10T12:00:47
-2026-06-12,South Korea,Czechia,1.06,1.51,1,2,1.4,3.4,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-10T12:00:47
-2026-06-12,Canada,Bosnia-Herzegovina,1.54,0.92,2,1,1.4,0.8,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-10T12:00:47
-2026-06-13,United States,Paraguay,1.17,1.05,1,1,2.2,1.8,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-10T12:00:47
-2026-06-13,Qatar,Switzerland,0.88,1.91,1,2,0.2,1.8,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T13:39:16
-2026-06-13,Brazil,Morocco,1.33,0.96,1,1,2.6,2.6,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T13:39:16
-2026-06-14,Haiti,Scotland,1.31,1.24,1,1,1.6,2.4,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T13:39:16
-2026-06-14,Australia,Turkey,0.9,2.19,1,2,1.4,2.0,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T13:39:16
-2026-06-11,Mexico,South Africa,1.99,0.92,2,1,2.45,0.74,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-11T14:12:26
-2026-06-12,South Korea,Czechia,1.08,1.23,1,1,0.89,3.7,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-11T14:12:26
-2026-06-12,Canada,Bosnia-Herzegovina,1.13,1.19,1,1,1.2,0.98,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-11T14:12:26
-2026-06-13,United States,Paraguay,1.24,1.08,1,1,3.94,1.85,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-11T14:12:26
-2026-06-13,Qatar,Switzerland,0.87,1.48,1,1,0.22,2.11,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T14:12:26
-2026-06-13,Brazil,Morocco,1.49,0.93,1,1,2.43,2.59,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T14:12:26
-2026-06-14,Haiti,Scotland,0.87,2.03,1,2,1.15,3.49,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T14:12:26
-2026-06-14,Australia,Turkey,0.95,1.57,1,2,1.65,2.26,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T14:12:26
-2026-06-11,Mexico,South Africa,2.39,1.0,2,1,2.45,0.74,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-11T14:15:49
-2026-06-12,South Korea,Czechia,0.47,0.55,0,1,0.89,3.7,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-11T14:15:49
-2026-06-12,Canada,Bosnia-Herzegovina,1.25,0.94,1,1,1.2,0.98,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-11T14:15:49
-2026-06-13,United States,Paraguay,1.54,1.14,2,1,3.94,1.85,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-11T14:15:49
-2026-06-13,Qatar,Switzerland,0.5,1.55,1,2,0.22,2.11,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T14:15:49
-2026-06-13,Brazil,Morocco,1.48,0.83,1,1,2.43,2.59,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T14:15:49
-2026-06-14,Haiti,Scotland,0.82,1.65,1,2,1.15,3.49,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T14:15:49
-2026-06-14,Australia,Turkey,0.62,1.65,1,2,1.65,2.26,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T14:15:49
-2026-06-11,Mexico,South Africa,1.9,1.23,2,1,2.32,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-11T14:20:42
-2026-06-12,South Korea,Czechia,0.5,0.94,0,1,1.09,3.62,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-11T14:20:42
-2026-06-12,Canada,Bosnia-Herzegovina,1.32,0.83,1,1,1.28,0.88,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-11T14:20:42
-2026-06-13,United States,Paraguay,0.95,0.97,1,1,3.18,1.84,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-11T14:20:42
-2026-06-13,Qatar,Switzerland,1.03,1.76,1,2,0.22,1.89,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T14:20:42
-2026-06-13,Brazil,Morocco,1.47,1.61,1,2,2.52,2.58,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T14:20:42
-2026-06-14,Haiti,Scotland,0.93,2.11,1,2,1.35,3.28,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T14:20:42
-2026-06-14,Australia,Turkey,0.78,2.05,1,2,1.65,2.02,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T14:20:42
-2026-06-11,Mexico,South Africa,1.92,1.21,2,1,2.32,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-11T14:22:01
-2026-06-12,South Korea,Czechia,0.62,1.09,1,1,1.09,3.62,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-11T14:22:01
-2026-06-12,Canada,Bosnia-Herzegovina,1.27,0.83,1,1,1.28,0.88,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-11T14:22:01
-2026-06-13,United States,Paraguay,0.95,0.96,1,1,3.18,1.84,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-11T14:22:01
-2026-06-13,Qatar,Switzerland,1.01,1.8,1,2,0.22,1.89,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T14:22:01
-2026-06-13,Brazil,Morocco,1.59,1.55,2,2,2.52,2.58,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T14:22:01
-2026-06-14,Haiti,Scotland,0.86,2.08,1,2,1.35,3.28,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T14:22:01
-2026-06-14,Australia,Turkey,0.73,2.03,1,2,1.65,2.02,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T14:22:01
-2026-06-14,Germany,Curaçao,2.38,0.86,2,1,3.81,0.92,885.5,229.3,2026-06-14_Germany_Curaçao,2026-06-12T14:13:29
-2026-06-14,Netherlands,Japan,1.99,0.01,2,0,2.21,1.69,808.0,262.2,2026-06-14_Netherlands_Japan,2026-06-12T14:13:29
-2026-06-14,Ivory Coast,Ecuador,1.02,0.65,1,1,2.33,1.67,410.9,387.8,2026-06-14_Ivory Coast_Ecuador,2026-06-12T14:13:29
-2026-06-15,Sweden,Tunisia,1.59,0.85,2,1,2.34,0.54,363.8,62.4,2026-06-15_Sweden_Tunisia,2026-06-12T14:13:29
-2026-06-15,Spain,Cape Verde Islands,1.84,0.97,2,1,1.93,1.49,1310.0,229.3,2026-06-15_Spain_Cape Verde Islands,2026-06-12T19:38:00
-2026-06-15,Belgium,Egypt,1.4,1.85,1,2,4.75,0.78,753.2,197.0,2026-06-15_Belgium_Egypt,2026-06-12T19:38:00
-2026-06-15,Saudi Arabia,Uruguay,1.05,2.12,1,2,1.2,1.0,30.4,449.7,2026-06-15_Saudi Arabia_Uruguay,2026-06-13T08:19:11
-2026-06-16,Iran,New Zealand,1.26,1.25,1,1,1.85,0.64,59.5,16.4,2026-06-16_Iran_New Zealand,2026-06-13T08:19:11
-2026-06-16,France,Senegal,1.78,0.47,2,0,2.79,1.14,1350.0,299.2,2026-06-16_France_Senegal,2026-06-14T08:39:44
-2026-06-16,Iraq,Norway,1.31,2.83,1,3,1.02,3.12,229.3,229.3,2026-06-16_Iraq_Norway,2026-06-14T08:39:44
-2026-06-17,Argentina,Algeria,1.95,1.04,2,1,2.38,1.38,777.2,229.3,2026-06-17_Argentina_Algeria,2026-06-14T08:39:44
-2026-06-17,Austria,Jordan,1.18,0.59,1,1,1.66,1.5,229.3,229.3,2026-06-17_Austria_Jordan,2026-06-14T08:39:44
-2026-06-17,Portugal,Congo DR,2.54,0.94,3,1,3.15,0.62,937.0,229.3,2026-06-17_Portugal_Congo DR,2026-06-15T10:53:06
-2026-06-17,England,Croatia,1.42,0.64,1,1,1.71,1.82,1620.0,377.0,2026-06-17_England_Croatia,2026-06-15T10:53:06
-2026-06-17,Ghana,Panama,0.96,1.28,1,1,0.64,1.96,216.9,6.3,2026-06-17_Ghana_Panama,2026-06-15T10:53:06
-2026-06-18,Uzbekistan,Colombia,0.71,1.62,1,2,1.32,1.84,229.3,250.8,2026-06-18_Uzbekistan_Colombia,2026-06-15T10:53:06
-2026-06-18,Czechia,South Africa,1.14,0.76,1,1,2.2,0.37,172.8,46.4,2026-06-18_Czechia_South Africa,2026-06-16T10:05:00
-2026-06-18,Switzerland,Bosnia-Herzegovina,0.46,0.94,0,1,1.68,0.83,322.1,115.0,2026-06-18_Switzerland_Bosnia-Herzegovina,2026-06-16T10:05:00
-2026-06-18,Canada,Qatar,1.61,1.16,2,1,0.95,0.68,187.3,14.9,2026-06-18_Canada_Qatar,2026-06-16T10:05:00
-2026-06-19,Mexico,South Korea,1.83,0.84,2,1,2.32,1.27,176.1,164.5,2026-06-19_Mexico_South Korea,2026-06-16T10:05:00
-2026-06-18,Switzerland,Bosnia-Herzegovina,0.6,0.92,1,1,1.68,0.88,322.1,115.0,2026-06-18_Switzerland_Bosnia-Herzegovina,2026-06-17T09:29:31
-2026-06-18,Canada,Qatar,1.62,0.56,2,1,1.28,0.68,187.3,14.9,2026-06-18_Canada_Qatar,2026-06-17T09:29:31
-2026-06-19,United States,Australia,0.75,1.24,1,1,2.37,2.01,350.7,50.2,2026-06-19_United States_Australia,2026-06-17T09:29:31
-2026-06-19,Scotland,Morocco,1.07,1.04,1,1,1.62,2.33,229.3,241.1,2026-06-19_Scotland_Morocco,2026-06-17T09:29:31
-2026-06-20,Brazil,Haiti,2.68,0.78,3,1,2.24,0.65,1140.0,229.3,2026-06-20_Brazil_Haiti,2026-06-17T09:29:31
-2026-06-20,Turkey,Paraguay,1.43,1.15,1,1,1.18,1.76,229.3,141.8,2026-06-20_Turkey_Paraguay,2026-06-17T09:29:31
-2026-06-18,Switzerland,Bosnia-Herzegovina,0.46,0.94,0,1,1.68,0.83,322.1,115.0,2026-06-18_Switzerland_Bosnia-Herzegovina,2026-06-17T10:24:11
-2026-06-18,Canada,Qatar,1.61,1.16,2,1,0.95,0.68,187.3,14.9,2026-06-18_Canada_Qatar,2026-06-17T10:24:11
+date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,home_form_attack,away_form_attack,home_market_value,away_market_value,match_key,predicted_at,stage,home_goals_et,away_goals_et,decided_by,predicted_winner
+2026-06-12,South Korea,Czechia,1.32,1.19,1,1,1.3,1.3,1129.3,1129.3,2026-06-12_South Korea_Czechia,2026-05-22T10:04:32,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.24,1.27,1,1,0.67,1.3,1129.3,1129.3,2026-06-12_Canada_Bosnia-Herzegovina,2026-05-22T10:04:32,,,,,
+2026-06-13,United States,Paraguay,1.21,1.37,1,1,1.0,0.6,1129.3,1129.3,2026-06-13_United States_Paraguay,2026-05-22T10:04:32,,,,,
+2026-06-13,Qatar,Switzerland,1.21,1.27,1,1,0.33,1.4,1129.3,1129.3,2026-06-13_Qatar_Switzerland,2026-05-22T10:04:32,,,,,
+2026-06-13,Brazil,Morocco,1.31,1.24,1,1,1.6,0.6,1137.8,1129.3,2026-06-13_Brazil_Morocco,2026-05-22T10:04:32,,,,,
+2026-06-14,Haiti,Scotland,1.32,1.19,1,1,1.3,1.3,1129.3,1129.3,2026-06-14_Haiti_Scotland,2026-05-22T10:04:32,,,,,
+2026-06-14,Australia,Turkey,1.26,1.18,1,1,1.0,1.3,1129.3,1129.3,2026-06-14_Australia_Turkey,2026-05-22T10:04:32,,,,,
+2026-06-14,Germany,Curaçao,1.28,1.03,1,1,1.6,1.3,1126.7,1129.3,2026-06-14_Germany_Curaçao,2026-05-22T10:04:32,,,,,
+2026-06-14,Netherlands,Japan,1.45,1.04,1,1,2.0,1.4,1120.0,1129.3,2026-06-14_Netherlands_Japan,2026-05-22T10:04:32,,,,,
+2026-06-14,Ivory Coast,Ecuador,1.32,1.22,1,1,1.3,1.4,1129.3,1129.3,2026-06-14_Ivory Coast_Ecuador,2026-05-22T10:04:32,,,,,
+2026-06-12,South Korea,Czechia,1.31,1.25,1,1,1.3,1.3,285.1,285.1,2026-06-12_South Korea_Czechia,2026-05-22T10:44:24,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.14,1.46,1,1,0.67,1.3,21.9,285.1,2026-06-12_Canada_Bosnia-Herzegovina,2026-05-22T10:44:24,,,,,
+2026-06-13,United States,Paraguay,1.25,1.28,1,1,1.0,0.6,169.7,124.0,2026-06-13_United States_Paraguay,2026-05-22T10:44:24,,,,,
+2026-06-13,Qatar,Switzerland,1.13,1.42,1,1,0.33,1.4,18.0,251.0,2026-06-13_Qatar_Switzerland,2026-05-22T10:44:24,,,,,
+2026-06-13,Brazil,Morocco,1.27,1.2,1,1,1.6,0.6,932.0,435.6,2026-06-13_Brazil_Morocco,2026-05-22T10:44:24,,,,,
+2026-06-14,Haiti,Scotland,1.31,1.25,1,1,1.3,1.3,285.1,285.1,2026-06-14_Haiti_Scotland,2026-05-22T10:44:24,,,,,
+2026-06-14,Australia,Turkey,1.14,1.44,1,1,1.0,1.3,32.8,285.1,2026-06-14_Australia_Turkey,2026-05-22T10:44:24,,,,,
+2026-06-14,Germany,Curaçao,1.3,1.11,1,1,1.6,1.3,828.0,285.1,2026-06-14_Germany_Curaçao,2026-05-22T10:44:24,,,,,
+2026-06-14,Netherlands,Japan,1.54,0.98,2,1,2.0,1.4,808.0,223.5,2026-06-14_Netherlands_Japan,2026-05-22T10:44:24,,,,,
+2026-06-14,Ivory Coast,Ecuador,1.3,1.26,1,1,1.3,1.4,285.1,349.6,2026-06-14_Ivory Coast_Ecuador,2026-05-22T10:44:24,,,,,
+2026-06-11,Mexico,South Africa,1.19,2.01,1,2,0.0,2.0,217.9,217.9,2026-06-11_Mexico_South Africa,2026-06-09T08:28:59,,,,,
+2026-06-12,South Korea,Czechia,1.55,1.0,2,1,2.0,1.3,217.9,281.8,2026-06-12_South Korea_Czechia,2026-06-09T08:28:59,,,,,
+2026-06-11,Mexico,South Africa,1.41,1.05,1,1,1.8,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-10T11:53:18,,,,,
+2026-06-12,South Korea,Czechia,1.22,1.32,1,1,1.4,3.4,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-10T11:53:18,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.36,1.1,1,1,1.4,0.8,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-10T11:53:18,,,,,
+2026-06-13,United States,Paraguay,1.31,1.09,1,1,2.2,1.8,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-10T11:53:18,,,,,
+2026-06-11,Mexico,South Africa,1.42,1.05,1,1,1.8,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-10T11:56:47,,,,,
+2026-06-13,United States,Paraguay,1.3,1.09,1,1,2.2,1.8,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-10T11:56:47,,,,,
+2026-06-11,Mexico,South Africa,1.68,1.05,2,1,1.8,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-10T11:57:48,,,,,
+2026-06-12,South Korea,Czechia,1.06,1.32,1,1,1.4,3.4,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-10T11:57:48,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.54,1.1,2,1,1.4,0.8,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-10T11:57:48,,,,,
+2026-06-13,United States,Paraguay,1.17,1.09,1,1,2.2,1.8,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-10T11:57:48,,,,,
+2026-06-11,Mexico,South Africa,1.68,0.85,2,1,1.8,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-10T12:00:47,,,,,
+2026-06-12,South Korea,Czechia,1.06,1.51,1,2,1.4,3.4,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-10T12:00:47,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.54,0.92,2,1,1.4,0.8,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-10T12:00:47,,,,,
+2026-06-13,United States,Paraguay,1.17,1.05,1,1,2.2,1.8,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-10T12:00:47,,,,,
+2026-06-13,Qatar,Switzerland,0.88,1.91,1,2,0.2,1.8,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T13:39:16,,,,,
+2026-06-13,Brazil,Morocco,1.33,0.96,1,1,2.6,2.6,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T13:39:16,,,,,
+2026-06-14,Haiti,Scotland,1.31,1.24,1,1,1.6,2.4,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T13:39:16,,,,,
+2026-06-14,Australia,Turkey,0.9,2.19,1,2,1.4,2.0,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T13:39:16,,,,,
+2026-06-11,Mexico,South Africa,1.99,0.92,2,1,2.45,0.74,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-11T14:12:26,,,,,
+2026-06-12,South Korea,Czechia,1.08,1.23,1,1,0.89,3.7,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-11T14:12:26,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.13,1.19,1,1,1.2,0.98,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-11T14:12:26,,,,,
+2026-06-13,United States,Paraguay,1.24,1.08,1,1,3.94,1.85,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-11T14:12:26,,,,,
+2026-06-13,Qatar,Switzerland,0.87,1.48,1,1,0.22,2.11,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T14:12:26,,,,,
+2026-06-13,Brazil,Morocco,1.49,0.93,1,1,2.43,2.59,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T14:12:26,,,,,
+2026-06-14,Haiti,Scotland,0.87,2.03,1,2,1.15,3.49,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T14:12:26,,,,,
+2026-06-14,Australia,Turkey,0.95,1.57,1,2,1.65,2.26,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T14:12:26,,,,,
+2026-06-11,Mexico,South Africa,2.39,1.0,2,1,2.45,0.74,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-11T14:15:49,,,,,
+2026-06-12,South Korea,Czechia,0.47,0.55,0,1,0.89,3.7,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-11T14:15:49,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.25,0.94,1,1,1.2,0.98,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-11T14:15:49,,,,,
+2026-06-13,United States,Paraguay,1.54,1.14,2,1,3.94,1.85,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-11T14:15:49,,,,,
+2026-06-13,Qatar,Switzerland,0.5,1.55,1,2,0.22,2.11,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T14:15:49,,,,,
+2026-06-13,Brazil,Morocco,1.48,0.83,1,1,2.43,2.59,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T14:15:49,,,,,
+2026-06-14,Haiti,Scotland,0.82,1.65,1,2,1.15,3.49,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T14:15:49,,,,,
+2026-06-14,Australia,Turkey,0.62,1.65,1,2,1.65,2.26,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T14:15:49,,,,,
+2026-06-11,Mexico,South Africa,1.9,1.23,2,1,2.32,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-11T14:20:42,,,,,
+2026-06-12,South Korea,Czechia,0.5,0.94,0,1,1.09,3.62,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-11T14:20:42,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.32,0.83,1,1,1.28,0.88,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-11T14:20:42,,,,,
+2026-06-13,United States,Paraguay,0.95,0.97,1,1,3.18,1.84,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-11T14:20:42,,,,,
+2026-06-13,Qatar,Switzerland,1.03,1.76,1,2,0.22,1.89,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T14:20:42,,,,,
+2026-06-13,Brazil,Morocco,1.47,1.61,1,2,2.52,2.58,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T14:20:42,,,,,
+2026-06-14,Haiti,Scotland,0.93,2.11,1,2,1.35,3.28,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T14:20:42,,,,,
+2026-06-14,Australia,Turkey,0.78,2.05,1,2,1.65,2.02,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T14:20:42,,,,,
+2026-06-11,Mexico,South Africa,1.92,1.21,2,1,2.32,0.8,176.1,46.4,2026-06-11_Mexico_South Africa,2026-06-11T14:22:01,,,,,
+2026-06-12,South Korea,Czechia,0.62,1.09,1,1,1.09,3.62,164.5,172.8,2026-06-12_South Korea_Czechia,2026-06-11T14:22:01,,,,,
+2026-06-12,Canada,Bosnia-Herzegovina,1.27,0.83,1,1,1.28,0.88,187.3,115.0,2026-06-12_Canada_Bosnia-Herzegovina,2026-06-11T14:22:01,,,,,
+2026-06-13,United States,Paraguay,0.95,0.96,1,1,3.18,1.84,350.7,141.8,2026-06-13_United States_Paraguay,2026-06-11T14:22:01,,,,,
+2026-06-13,Qatar,Switzerland,1.01,1.8,1,2,0.22,1.89,14.9,322.1,2026-06-13_Qatar_Switzerland,2026-06-11T14:22:01,,,,,
+2026-06-13,Brazil,Morocco,1.59,1.55,2,2,2.52,2.58,1140.0,241.1,2026-06-13_Brazil_Morocco,2026-06-11T14:22:01,,,,,
+2026-06-14,Haiti,Scotland,0.86,2.08,1,2,1.35,3.28,229.3,229.3,2026-06-14_Haiti_Scotland,2026-06-11T14:22:01,,,,,
+2026-06-14,Australia,Turkey,0.73,2.03,1,2,1.65,2.02,50.2,229.3,2026-06-14_Australia_Turkey,2026-06-11T14:22:01,,,,,
+2026-06-14,Germany,Curaçao,2.38,0.86,2,1,3.81,0.92,885.5,229.3,2026-06-14_Germany_Curaçao,2026-06-12T14:13:29,,,,,
+2026-06-14,Netherlands,Japan,1.99,0.01,2,0,2.21,1.69,808.0,262.2,2026-06-14_Netherlands_Japan,2026-06-12T14:13:29,,,,,
+2026-06-14,Ivory Coast,Ecuador,1.02,0.65,1,1,2.33,1.67,410.9,387.8,2026-06-14_Ivory Coast_Ecuador,2026-06-12T14:13:29,,,,,
+2026-06-15,Sweden,Tunisia,1.59,0.85,2,1,2.34,0.54,363.8,62.4,2026-06-15_Sweden_Tunisia,2026-06-12T14:13:29,,,,,
+2026-06-15,Spain,Cape Verde Islands,1.84,0.97,2,1,1.93,1.49,1310.0,229.3,2026-06-15_Spain_Cape Verde Islands,2026-06-12T19:38:00,,,,,
+2026-06-15,Belgium,Egypt,1.4,1.85,1,2,4.75,0.78,753.2,197.0,2026-06-15_Belgium_Egypt,2026-06-12T19:38:00,,,,,
+2026-06-15,Saudi Arabia,Uruguay,1.05,2.12,1,2,1.2,1.0,30.4,449.7,2026-06-15_Saudi Arabia_Uruguay,2026-06-13T08:19:11,,,,,
+2026-06-16,Iran,New Zealand,1.26,1.25,1,1,1.85,0.64,59.5,16.4,2026-06-16_Iran_New Zealand,2026-06-13T08:19:11,,,,,
+2026-06-16,France,Senegal,1.78,0.47,2,0,2.79,1.14,1350.0,299.2,2026-06-16_France_Senegal,2026-06-14T08:39:44,,,,,
+2026-06-16,Iraq,Norway,1.31,2.83,1,3,1.02,3.12,229.3,229.3,2026-06-16_Iraq_Norway,2026-06-14T08:39:44,,,,,
+2026-06-17,Argentina,Algeria,1.95,1.04,2,1,2.38,1.38,777.2,229.3,2026-06-17_Argentina_Algeria,2026-06-14T08:39:44,,,,,
+2026-06-17,Austria,Jordan,1.18,0.59,1,1,1.66,1.5,229.3,229.3,2026-06-17_Austria_Jordan,2026-06-14T08:39:44,,,,,
+2026-06-17,Portugal,Congo DR,2.54,0.94,3,1,3.15,0.62,937.0,229.3,2026-06-17_Portugal_Congo DR,2026-06-15T10:53:06,,,,,
+2026-06-17,England,Croatia,1.42,0.64,1,1,1.71,1.82,1620.0,377.0,2026-06-17_England_Croatia,2026-06-15T10:53:06,,,,,
+2026-06-17,Ghana,Panama,0.96,1.28,1,1,0.64,1.96,216.9,6.3,2026-06-17_Ghana_Panama,2026-06-15T10:53:06,,,,,
+2026-06-18,Uzbekistan,Colombia,0.71,1.62,1,2,1.32,1.84,229.3,250.8,2026-06-18_Uzbekistan_Colombia,2026-06-15T10:53:06,,,,,
+2026-06-18,Czechia,South Africa,1.14,0.76,1,1,2.2,0.37,172.8,46.4,2026-06-18_Czechia_South Africa,2026-06-16T10:05:00,,,,,
+2026-06-18,Switzerland,Bosnia-Herzegovina,0.46,0.94,0,1,1.68,0.83,322.1,115.0,2026-06-18_Switzerland_Bosnia-Herzegovina,2026-06-16T10:05:00,,,,,
+2026-06-18,Canada,Qatar,1.61,1.16,2,1,0.95,0.68,187.3,14.9,2026-06-18_Canada_Qatar,2026-06-16T10:05:00,,,,,
+2026-06-19,Mexico,South Korea,1.83,0.84,2,1,2.32,1.27,176.1,164.5,2026-06-19_Mexico_South Korea,2026-06-16T10:05:00,,,,,
+2026-06-18,Switzerland,Bosnia-Herzegovina,0.6,0.92,1,1,1.68,0.88,322.1,115.0,2026-06-18_Switzerland_Bosnia-Herzegovina,2026-06-17T09:29:31,,,,,
+2026-06-18,Canada,Qatar,1.62,0.56,2,1,1.28,0.68,187.3,14.9,2026-06-18_Canada_Qatar,2026-06-17T09:29:31,,,,,
+2026-06-19,United States,Australia,0.75,1.24,1,1,2.37,2.01,350.7,50.2,2026-06-19_United States_Australia,2026-06-17T09:29:31,,,,,
+2026-06-19,Scotland,Morocco,1.07,1.04,1,1,1.62,2.33,229.3,241.1,2026-06-19_Scotland_Morocco,2026-06-17T09:29:31,,,,,
+2026-06-20,Brazil,Haiti,2.68,0.78,3,1,2.24,0.65,1140.0,229.3,2026-06-20_Brazil_Haiti,2026-06-17T09:29:31,,,,,
+2026-06-20,Turkey,Paraguay,1.43,1.15,1,1,1.18,1.76,229.3,141.8,2026-06-20_Turkey_Paraguay,2026-06-17T09:29:31,,,,,
+2026-06-18,Switzerland,Bosnia-Herzegovina,0.46,0.94,0,1,1.68,0.83,322.1,115.0,2026-06-18_Switzerland_Bosnia-Herzegovina,2026-06-17T10:24:11,,,,,
+2026-06-18,Canada,Qatar,1.61,1.16,2,1,0.95,0.68,187.3,14.9,2026-06-18_Canada_Qatar,2026-06-17T10:24:11,,,,,
+2026-06-20,Netherlands,Sweden,1.06,0.81,1,1,1.73,3.06,808.0,363.8,2026-06-20_Netherlands_Sweden,2026-06-18T09:11:30,GROUP_STAGE,0.0,0.0,90min,draw
+2026-06-20,Germany,Ivory Coast,2.71,0.45,3,0,4.92,1.86,885.5,410.9,2026-06-20_Germany_Ivory Coast,2026-06-18T09:11:30,GROUP_STAGE,0.0,0.0,90min,home
+2026-06-21,Ecuador,Curaçao,0.74,1.1,1,1,1.07,1.38,387.8,229.3,2026-06-21_Ecuador_Curaçao,2026-06-18T09:11:30,GROUP_STAGE,0.0,0.0,90min,draw
+2026-06-21,Tunisia,Japan,0.71,1.83,1,2,0.73,2.14,62.4,262.2,2026-06-21_Tunisia_Japan,2026-06-18T09:11:30,GROUP_STAGE,0.0,0.0,90min,away
