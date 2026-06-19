@@ -1,8 +1,4 @@
 date,home_team,away_team,stage,pred_home_goals,pred_away_goals,tipp_home,tipp_away,home_goals_et,away_goals_et,decided_by,predicted_winner,home_form_attack,away_form_attack,home_market_value,away_market_value
-2026-06-18,Czechia,South Africa,GROUP_STAGE,1.14,0.76,1,1,0,0,90min,draw,2.2,0.37,172.8,46.4
-2026-06-18,Switzerland,Bosnia-Herzegovina,GROUP_STAGE,0.46,0.94,0,1,0,0,90min,away,1.68,0.83,322.1,115.0
-2026-06-18,Canada,Qatar,GROUP_STAGE,1.61,1.16,2,1,0,0,90min,home,0.95,0.68,187.3,14.9
-2026-06-19,Mexico,South Korea,GROUP_STAGE,1.83,0.84,2,1,0,0,90min,home,2.32,1.27,176.1,164.5
 2026-06-19,United States,Australia,GROUP_STAGE,0.75,1.24,1,1,0,0,90min,draw,2.37,2.01,350.7,50.2
 2026-06-19,Scotland,Morocco,GROUP_STAGE,1.07,1.04,1,1,0,0,90min,draw,1.62,2.33,229.3,241.1
 2026-06-20,Brazil,Haiti,GROUP_STAGE,2.68,0.78,3,1,0,0,90min,home,2.24,0.65,1140.0,229.3
@@ -11,3 +7,7 @@ date,home_team,away_team,stage,pred_home_goals,pred_away_goals,tipp_home,tipp_aw
 2026-06-20,Germany,Ivory Coast,GROUP_STAGE,2.71,0.45,3,0,0,0,90min,home,4.92,1.86,885.5,410.9
 2026-06-21,Ecuador,Curaçao,GROUP_STAGE,0.74,1.1,1,1,0,0,90min,draw,1.07,1.38,387.8,229.3
 2026-06-21,Tunisia,Japan,GROUP_STAGE,0.71,1.83,1,2,0,0,90min,away,0.73,2.14,62.4,262.2
+2026-06-21,Spain,Saudi Arabia,GROUP_STAGE,1.72,0.69,2,1,0,0,90min,home,1.17,1.5,1310.0,30.4
+2026-06-21,Belgium,Iran,GROUP_STAGE,1.48,0.86,1,1,0,0,90min,draw,2.6,2.04,753.2,59.5
+2026-06-21,Uruguay,Cape Verde Islands,GROUP_STAGE,1.73,1.23,2,1,0,0,90min,home,0.73,1.07,449.7,229.3
+2026-06-22,New Zealand,Egypt,GROUP_STAGE,0.18,2.13,0,2,0,0,90min,away,1.0,1.36,16.4,197.0
