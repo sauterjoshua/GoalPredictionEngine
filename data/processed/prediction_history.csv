@@ -107,3 +107,7 @@ date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,hom
 2026-06-21,Belgium,Iran,1.48,0.86,1,1,2.6,2.04,753.2,59.5,2026-06-21_Belgium_Iran,2026-06-19T09:26:45,GROUP_STAGE,0.0,0.0,90min,draw
 2026-06-21,Uruguay,Cape Verde Islands,1.73,1.23,2,1,0.73,1.07,449.7,229.3,2026-06-21_Uruguay_Cape Verde Islands,2026-06-19T09:26:45,GROUP_STAGE,0.0,0.0,90min,home
 2026-06-22,New Zealand,Egypt,0.18,2.13,0,2,1.0,1.36,16.4,197.0,2026-06-22_New Zealand_Egypt,2026-06-19T09:26:45,GROUP_STAGE,0.0,0.0,90min,away
+2026-06-22,Argentina,Austria,1.58,1.05,2,1,2.77,2.03,777.2,229.3,2026-06-22_Argentina_Austria,2026-06-20T08:20:30,GROUP_STAGE,0.0,0.0,90min,home
+2026-06-22,France,Iraq,2.12,0.87,2,1,3.16,1.19,1350.0,229.3,2026-06-22_France_Iraq,2026-06-20T08:20:30,GROUP_STAGE,0.0,0.0,90min,home
+2026-06-23,Norway,Senegal,1.07,0.23,1,0,2.62,1.72,229.3,299.2,2026-06-23_Norway_Senegal,2026-06-20T08:20:30,GROUP_STAGE,0.0,0.0,90min,home
+2026-06-23,Jordan,Algeria,1.12,0.89,1,1,1.19,1.06,229.3,229.3,2026-06-23_Jordan_Algeria,2026-06-20T08:20:30,GROUP_STAGE,0.0,0.0,90min,draw
