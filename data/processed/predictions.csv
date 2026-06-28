@@ -1,14 +1,8 @@
 date,home_team,away_team,stage,pred_home_goals,pred_away_goals,tipp_home,tipp_away,home_goals_et,away_goals_et,decided_by,predicted_winner,home_form_attack,away_form_attack,home_market_value,away_market_value
-2026-06-26,Norway,France,GROUP_STAGE,0.94,1.64,1,2,0,0,90min,away,3.17,3.13,229.3,1350.0
-2026-06-26,Senegal,Iraq,GROUP_STAGE,0.59,1.23,1,1,0,0,90min,draw,1.84,0.62,299.2,229.3
-2026-06-27,Uruguay,Spain,GROUP_STAGE,1.29,1.06,1,1,0,0,90min,draw,1.22,1.26,449.7,1310.0
-2026-06-27,Cape Verde Islands,Saudi Arabia,GROUP_STAGE,1.2,0.24,1,0,0,0,90min,home,1.61,1.03,229.3,30.4
-2026-06-27,New Zealand,Belgium,GROUP_STAGE,0.6,2.03,1,2,0,0,90min,away,1.11,1.18,16.4,753.2
-2026-06-27,Egypt,Iran,GROUP_STAGE,0.88,0.53,1,1,0,0,90min,draw,1.41,1.5,197.0,59.5
-2026-06-27,Panama,England,GROUP_STAGE,0.44,2.07,0,2,0,0,90min,away,0.96,2.15,6.3,1620.0
-2026-06-27,Croatia,Ghana,GROUP_STAGE,1.16,1.4,1,1,0,0,90min,draw,1.52,0.49,377.0,216.9
-2026-06-27,Colombia,Portugal,GROUP_STAGE,0.51,2.77,1,3,0,0,90min,away,1.95,2.42,250.8,937.0
-2026-06-27,Congo DR,Uzbekistan,GROUP_STAGE,1.17,0.94,1,1,0,0,90min,draw,0.71,0.51,229.3,229.3
-2026-06-28,Jordan,Argentina,GROUP_STAGE,0.43,1.93,0,2,0,0,90min,away,1.11,2.62,229.3,777.2
-2026-06-28,Algeria,Austria,GROUP_STAGE,0.79,1.78,1,2,0,0,90min,away,1.69,1.71,229.3,229.3
-2026-06-28,,,LAST_32,1.27,0.87,1,1,0,0,penalties,away,1.3,1.3,229.3,229.3
+2026-06-28,South Africa,Canada,LAST_32,0.93,2.61,1,3,0,0,90min,away,0.49,1.97,46.4,187.3
+2026-06-29,Brazil,Japan,LAST_32,1.62,0.8,2,1,0,0,90min,home,2.48,2.15,1140.0,262.2
+2026-06-29,Germany,Paraguay,LAST_32,1.73,0.72,2,1,0,0,90min,home,3.76,1.19,885.5,141.8
+2026-06-30,Netherlands,Morocco,LAST_32,1.5,1.03,2,1,0,0,90min,home,3.34,2.24,808.0,241.1
+2026-06-30,Ivory Coast,Norway,LAST_32,1.14,1.06,1,1,0,0,penalties,home,1.74,3.06,410.9,229.3
+2026-06-30,France,Sweden,LAST_32,1.33,0.45,1,0,0,0,90min,home,3.35,1.96,1350.0,363.8
+2026-07-01,Mexico,Ecuador,LAST_32,1.21,1.51,1,2,0,0,90min,away,2.02,1.25,176.1,387.8
