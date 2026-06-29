@@ -149,3 +149,6 @@ date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,hom
 2026-06-30,Ivory Coast,Norway,1.14,1.06,1,1,1.74,3.06,410.9,229.3,2026-06-30_Ivory Coast_Norway,2026-06-28T08:17:46,LAST_32,0.0,0.0,penalties,home
 2026-06-30,France,Sweden,1.33,0.45,1,0,3.35,1.96,1350.0,363.8,2026-06-30_France_Sweden,2026-06-28T08:17:46,LAST_32,0.0,0.0,90min,home
 2026-07-01,Mexico,Ecuador,1.21,1.51,1,2,2.02,1.25,176.1,387.8,2026-07-01_Mexico_Ecuador,2026-06-28T08:17:46,LAST_32,0.0,0.0,90min,away
+2026-07-01,England,Congo DR,1.36,1.08,1,1,2.02,1.26,1620.0,229.3,2026-07-01_England_Congo DR,2026-06-29T09:24:51,LAST_32,0.0,0.0,penalties,home
+2026-07-01,Belgium,Senegal,0.82,0.59,1,1,1.83,2.55,753.2,299.2,2026-07-01_Belgium_Senegal,2026-06-29T09:24:51,LAST_32,0.0,0.0,penalties,home
+2026-07-02,United States,Bosnia-Herzegovina,1.39,0.78,1,1,2.2,1.21,350.7,115.0,2026-07-02_United States_Bosnia-Herzegovina,2026-06-29T09:24:51,LAST_32,0.0,0.0,penalties,home
