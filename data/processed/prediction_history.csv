@@ -152,3 +152,6 @@ date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,hom
 2026-07-01,England,Congo DR,1.36,1.08,1,1,2.02,1.26,1620.0,229.3,2026-07-01_England_Congo DR,2026-06-29T09:24:51,LAST_32,0.0,0.0,penalties,home
 2026-07-01,Belgium,Senegal,0.82,0.59,1,1,1.83,2.55,753.2,299.2,2026-07-01_Belgium_Senegal,2026-06-29T09:24:51,LAST_32,0.0,0.0,penalties,home
 2026-07-02,United States,Bosnia-Herzegovina,1.39,0.78,1,1,2.2,1.21,350.7,115.0,2026-07-02_United States_Bosnia-Herzegovina,2026-06-29T09:24:51,LAST_32,0.0,0.0,penalties,home
+2026-07-02,Spain,Austria,1.84,0.56,2,1,1.46,1.73,1310.0,229.3,2026-07-02_Spain_Austria,2026-06-30T08:26:37,LAST_32,0.0,0.0,90min,home
+2026-07-02,Portugal,Croatia,2.36,0.37,2,0,2.04,1.62,937.0,377.0,2026-07-02_Portugal_Croatia,2026-06-30T08:26:37,LAST_32,0.0,0.0,90min,home
+2026-07-03,Switzerland,Algeria,0.92,0.95,1,1,1.85,1.47,322.1,229.3,2026-07-03_Switzerland_Algeria,2026-06-30T08:26:37,LAST_32,0.0,0.0,penalties,home
