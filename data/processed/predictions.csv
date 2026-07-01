@@ -1,10 +1,10 @@
 date,home_team,away_team,stage,pred_home_goals,pred_away_goals,tipp_home,tipp_away,home_goals_et,away_goals_et,decided_by,predicted_winner,home_form_attack,away_form_attack,home_market_value,away_market_value
-2026-06-30,Ivory Coast,Norway,LAST_32,1.14,1.06,1,1,0,0,penalties,home,1.74,3.06,410.9,229.3
-2026-06-30,France,Sweden,LAST_32,1.33,0.45,1,0,0,0,90min,home,3.35,1.96,1350.0,363.8
-2026-07-01,Mexico,Ecuador,LAST_32,1.21,1.51,1,2,0,0,90min,away,2.02,1.25,176.1,387.8
 2026-07-01,England,Congo DR,LAST_32,1.36,1.08,1,1,0,0,penalties,home,2.02,1.26,1620.0,229.3
 2026-07-01,Belgium,Senegal,LAST_32,0.82,0.59,1,1,0,0,penalties,home,1.83,2.55,753.2,299.2
 2026-07-02,United States,Bosnia-Herzegovina,LAST_32,1.39,0.78,1,1,0,0,penalties,home,2.2,1.21,350.7,115.0
 2026-07-02,Spain,Austria,LAST_32,1.84,0.56,2,1,0,0,90min,home,1.46,1.73,1310.0,229.3
 2026-07-02,Portugal,Croatia,LAST_32,2.36,0.37,2,0,0,0,90min,home,2.04,1.62,937.0,377.0
 2026-07-03,Switzerland,Algeria,LAST_32,0.92,0.95,1,1,0,0,penalties,home,1.85,1.47,322.1,229.3
+2026-07-03,Australia,Egypt,LAST_32,1.18,0.79,1,1,0,0,penalties,away,0.67,1.37,50.2,197.0
+2026-07-03,Argentina,Cape Verde Islands,LAST_32,1.96,0.8,2,1,0,0,90min,home,2.47,1.26,777.2,229.3
+2026-07-04,Colombia,Ghana,LAST_32,1.69,1.31,2,1,0,0,90min,home,1.48,0.65,250.8,216.9

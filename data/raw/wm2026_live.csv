@@ -75,9 +75,9 @@ date,home_team,away_team,home_score,away_score,tournament,status,stage
 2026-06-29T17:00:00Z,Brazil,Japan,2.0,1.0,FIFA World Cup,FINISHED,LAST_32
 2026-06-29T20:30:00Z,Germany,Paraguay,4.0,5.0,FIFA World Cup,FINISHED,LAST_32
 2026-06-30T01:00:00Z,Netherlands,Morocco,3.0,4.0,FIFA World Cup,FINISHED,LAST_32
-2026-06-30T17:00:00Z,Ivory Coast,Norway,,,FIFA World Cup,TIMED,LAST_32
-2026-06-30T21:00:00Z,France,Sweden,,,FIFA World Cup,TIMED,LAST_32
-2026-07-01T01:00:00Z,Mexico,Ecuador,,,FIFA World Cup,TIMED,LAST_32
+2026-06-30T17:00:00Z,Ivory Coast,Norway,1.0,2.0,FIFA World Cup,FINISHED,LAST_32
+2026-06-30T21:00:00Z,France,Sweden,3.0,0.0,FIFA World Cup,FINISHED,LAST_32
+2026-07-01T01:00:00Z,Mexico,Ecuador,2.0,0.0,FIFA World Cup,FINISHED,LAST_32
 2026-07-01T16:00:00Z,England,Congo DR,,,FIFA World Cup,TIMED,LAST_32
 2026-07-01T20:00:00Z,Belgium,Senegal,,,FIFA World Cup,TIMED,LAST_32
 2026-07-02T00:00:00Z,United States,Bosnia-Herzegovina,,,FIFA World Cup,TIMED,LAST_32
@@ -88,8 +88,8 @@ date,home_team,away_team,home_score,away_score,tournament,status,stage
 2026-07-03T22:00:00Z,Argentina,Cape Verde Islands,,,FIFA World Cup,TIMED,LAST_32
 2026-07-04T01:30:00Z,Colombia,Ghana,,,FIFA World Cup,TIMED,LAST_32
 2026-07-04T17:00:00Z,Canada,Morocco,,,FIFA World Cup,TIMED,LAST_16
-2026-07-04T21:00:00Z,Paraguay,,,,FIFA World Cup,TIMED,LAST_16
-2026-07-05T20:00:00Z,Brazil,,,,FIFA World Cup,TIMED,LAST_16
+2026-07-04T21:00:00Z,Paraguay,France,,,FIFA World Cup,TIMED,LAST_16
+2026-07-05T20:00:00Z,Brazil,Norway,,,FIFA World Cup,TIMED,LAST_16
 2026-07-06T00:00:00Z,,,,,FIFA World Cup,TIMED,LAST_16
 2026-07-06T19:00:00Z,,,,,FIFA World Cup,TIMED,LAST_16
 2026-07-07T00:00:00Z,,,,,FIFA World Cup,TIMED,LAST_16
