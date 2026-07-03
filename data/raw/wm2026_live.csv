@@ -81,9 +81,9 @@ date,home_team,away_team,home_score,away_score,tournament,status,stage
 2026-07-01T16:00:00Z,England,Congo DR,2.0,1.0,FIFA World Cup,FINISHED,LAST_32
 2026-07-01T20:00:00Z,Belgium,Senegal,3.0,2.0,FIFA World Cup,FINISHED,LAST_32
 2026-07-02T00:00:00Z,United States,Bosnia-Herzegovina,2.0,0.0,FIFA World Cup,FINISHED,LAST_32
-2026-07-02T19:00:00Z,Spain,Austria,,,FIFA World Cup,TIMED,LAST_32
-2026-07-02T23:00:00Z,Portugal,Croatia,,,FIFA World Cup,TIMED,LAST_32
-2026-07-03T03:00:00Z,Switzerland,Algeria,,,FIFA World Cup,TIMED,LAST_32
+2026-07-02T19:00:00Z,Spain,Austria,3.0,0.0,FIFA World Cup,FINISHED,LAST_32
+2026-07-02T23:00:00Z,Portugal,Croatia,2.0,1.0,FIFA World Cup,FINISHED,LAST_32
+2026-07-03T03:00:00Z,Switzerland,Algeria,2.0,0.0,FIFA World Cup,FINISHED,LAST_32
 2026-07-03T18:00:00Z,Australia,Egypt,,,FIFA World Cup,TIMED,LAST_32
 2026-07-03T22:00:00Z,Argentina,Cape Verde Islands,,,FIFA World Cup,TIMED,LAST_32
 2026-07-04T01:30:00Z,Colombia,Ghana,,,FIFA World Cup,TIMED,LAST_32

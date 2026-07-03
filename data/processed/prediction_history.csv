@@ -160,3 +160,5 @@ date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,hom
 2026-07-04,Colombia,Ghana,1.69,1.31,2,1,1.48,0.65,250.8,216.9,2026-07-04_Colombia_Ghana,2026-07-01T08:47:52,LAST_32,0.0,0.0,90min,home
 2026-07-04,Canada,Morocco,0.3,0.57,0,1,1.68,2.93,187.3,241.1,2026-07-04_Canada_Morocco,2026-07-02T08:10:19,LAST_16,0.0,0.0,90min,away
 2026-07-04,Paraguay,France,0.32,2.01,0,2,2.64,3.78,141.8,1350.0,2026-07-04_Paraguay_France,2026-07-02T08:10:19,LAST_16,0.0,0.0,90min,away
+2026-07-05,Brazil,Norway,2.59,0.51,3,1,2.28,2.92,1140.0,229.3,2026-07-05_Brazil_Norway,2026-07-03T07:58:45,LAST_16,0.0,0.0,90min,home
+2026-07-06,Mexico,England,0.41,2.03,0,2,2.36,2.2,176.1,1620.0,2026-07-06_Mexico_England,2026-07-03T07:58:45,LAST_16,0.0,0.0,90min,away
