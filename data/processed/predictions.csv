@@ -1,7 +1,7 @@
 date,home_team,away_team,stage,pred_home_goals,pred_away_goals,tipp_home,tipp_away,home_goals_et,away_goals_et,decided_by,predicted_winner,home_form_attack,away_form_attack,home_market_value,away_market_value
-2026-07-04,Canada,Morocco,LAST_16,0.3,0.57,0,1,0,0,90min,away,1.68,2.93,187.3,241.1
-2026-07-04,Paraguay,France,LAST_16,0.32,2.01,0,2,0,0,90min,away,2.64,3.78,141.8,1350.0
 2026-07-05,Brazil,Norway,LAST_16,2.59,0.51,3,1,0,0,90min,home,2.28,2.92,1140.0,229.3
 2026-07-06,Mexico,England,LAST_16,0.41,2.03,0,2,0,0,90min,away,2.36,2.2,176.1,1620.0
 2026-07-06,Portugal,Spain,LAST_16,1.83,0.77,2,1,0,0,90min,home,2.17,1.85,937.0,1310.0
 2026-07-07,United States,Belgium,LAST_16,0.91,1.75,1,2,0,0,90min,away,1.86,2.2,350.7,753.2
+2026-07-07,Argentina,Egypt,LAST_16,1.44,0.71,1,1,0,0,penalties,home,2.69,1.91,777.2,197.0
+2026-07-07,Switzerland,Colombia,LAST_16,1.15,1.71,1,2,0,0,90min,away,1.68,1.31,322.1,250.8
