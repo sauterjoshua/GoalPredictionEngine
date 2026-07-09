@@ -168,3 +168,5 @@ date,home_team,away_team,pred_home_goals,pred_away_goals,tipp_home,tipp_away,hom
 2026-07-07,Switzerland,Colombia,1.15,1.71,1,2,1.68,1.31,322.1,250.8,2026-07-07_Switzerland_Colombia,2026-07-05T07:54:28,LAST_16,0.0,0.0,90min,away
 2026-07-09,France,Morocco,0.76,0.53,1,1,3.22,2.99,1350.0,241.1,2026-07-09_France_Morocco,2026-07-07T08:19:36,QUARTER_FINALS,0.0,0.0,penalties,home
 2026-07-10,Spain,Belgium,0.5,0.76,0,1,1.76,2.85,1310.0,753.2,2026-07-10_Spain_Belgium,2026-07-08T07:25:40,QUARTER_FINALS,0.0,0.0,90min,away
+2026-07-11,Norway,England,0.51,0.85,1,1,3.08,2.34,229.3,1620.0,2026-07-11_Norway_England,2026-07-09T08:23:40,QUARTER_FINALS,0.0,0.0,penalties,away
+2026-07-12,Argentina,Switzerland,1.91,0.59,2,1,2.72,2.3,777.2,322.1,2026-07-12_Argentina_Switzerland,2026-07-09T08:23:40,QUARTER_FINALS,0.0,0.0,90min,home
