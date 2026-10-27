@@ -17,6 +17,7 @@ Eine end-to-end MLOps-Pipeline, die täglich Torergebnis-Prognosen für die **FI
 9. [CI/CD mit GitHub Actions](#cicd-mit-github-actions)
 10. [Ausgaben](#ausgaben)
 11. [Modell-Diagnostik](#modell-diagnostik)
+12. [Backtest: WM 2026](#backtest-wm-2026)
 
 ---
 
@@ -415,3 +416,43 @@ Zeigt den kumulierten mittleren absoluten Fehler, sobald echte WM-2026-Ergebniss
 ![Prediction Evolution](plots/6_prediction_evolution.png)
 
 Verfolgt, wie sich die Tipp-Werte einzelner Spiele über die Zeit verschieben — z.B. wenn neue Formkurven-Daten durch gespielte Gruppenspiele einfließen.
+---
+
+## Backtest: WM 2026
+
+Nach Turnierende (alle 104 Spiele beendet) wurden die gespeicherten Vorhersagen aus `prediction_history.csv` gegen die echten Ergebnisse geprüft. Pro Spiel zählt der **letzte Tipp vor Anpfiff**. Reproduzierbar mit `python analysis/evaluate_tips.py` (Plots, Einzelauswertung in `data/processed/tippspiel_auswertung.csv`) und `python analysis/evaluate_honest.py` (Kennzahlen, Baselines).
+
+**Punkteschema (Tippspiel):** falscher Sieger 0 · richtiger Sieger 2 · Sieger + Differenz 3 · exaktes Ergebnis 4 · Remis richtig getippt 2 · Remis exakt 4.
+
+### Gruppenphase (72 Spiele, Tipp und Ergebnis direkt vergleichbar)
+
+| Methode | Punkte | Ø pro Spiel |
+|---|---|---|
+| **Engine** | **91** | **1,26** (95 %-Intervall 0,97 bis 1,57) |
+| Immer 2:1 für den Heimverein | 85 | 1,18 |
+| Immer 1:1 | 58 | 0,81 |
+| Marktwert-Favorit gewinnt 2:1 | 97 | 1,35 |
+
+Tendenz korrekt in 52,8 % der Spiele, exaktes Ergebnis in 5,6 %. Die Engine tippt 28 Remis, tatsächlich gab es 20.
+
+![Punkteverteilung](plots/7_tippspiel_verteilung.png)
+![Kumulierte Punkte](plots/8_tippspiel_kumuliert.png)
+![Baselines](plots/9_tippspiel_baselines.png)
+![Getippte Ergebnisse](plots/10_tippspiel_ergebnisse.png)
+
+### K.o.-Phase (32 Spiele): nur Weiterkommen
+
+Die Engine tippt das 90-Minuten-Ergebnis. Die Ergebnisdaten (`fullTime` der API) enthalten bei K.o.-Spielen aber Verlängerung und Elfmeterschießen. Eine Bewertung nach dem Punkteschema wäre deshalb unfair, die 90-Minuten-Stände liegen nicht vor. Bewertet wird stattdessen `predicted_winner`:
+
+| Methode | Treffer |
+|---|---|
+| Engine | 22 von 32 (68,8 %) |
+| Immer Heim | 53,1 % |
+| Marktwert-Favorit | 78,1 % |
+
+### Einordnung
+
+- Die Engine ist besser als Zufall und besser als "immer 1:1", aber **nicht belegbar besser als einfache Regeln** wie "Heimsieg 2:1". Mit 72 Spielen liegt der Unterschied innerhalb der Unsicherheit.
+- Der Marktwert-Favorit schlägt die Engine in beiden Phasen leicht. Dieser Vergleich ist schwach: Frühe Prognosen enthalten bei vielen Teams denselben Platzhalter-Marktwert (1129,3), dann gewinnt bei Gleichstand der Heimverein.
+- Die Engine tippt zu viele Remis.
+- **Kein fairer Vergleich mit menschlichen Tipps:** Menschen kennen Aufstellungen, Verletzungen und aktuelle Form, tippen kurz vor Anpfiff und kennen die Wertung der K.o.-Spiele. Die Engine nutzt nur Historie, Formkurve und Marktwerte.
