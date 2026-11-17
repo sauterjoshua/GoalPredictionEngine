@@ -245,3 +245,6 @@ downloaded_files/
 requirements_old.txt
 
 test_api.py
+
+# Dagster: temporaere Home-Verzeichnisse (Zufallssuffix) mit runs.db etc.
+.tmp_dagster_home_*/
